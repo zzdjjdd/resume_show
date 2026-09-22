@@ -1,0 +1,114 @@
+/* ============================================================
+   AI 模拟面试页 · Sci-Fi HUD 专属样式（复用 ai-create.css 聊天气泡）
+   ============================================================ */
+.iv-logo { color: #7dd3fc; border-color: rgba(56,189,248,.45); background: linear-gradient(135deg, rgba(14,165,233,.22), rgba(56,189,248,.12)); box-shadow: 0 0 16px rgba(14,165,233,.4); }
+
+.iv-main {
+  flex: 1 1 auto; min-height: 0;
+  display: grid; grid-template-columns: 320px minmax(420px, 1fr);
+  position: relative; z-index: 1;
+}
+
+/* 左侧设置栏（任务配置面板） */
+/* 简历来源切换（档案 / PDF 导入） */
+.iv-src-row { display: flex; gap: 8px; margin-bottom: 13px; }
+.iv-src-chip {
+  flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 12.5px; font-weight: 700; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--line); background: rgba(2,6,23,.5); color: var(--ink-2);
+  cursor: pointer; transition: all .18s;
+}
+.iv-src-chip:hover { border-color: var(--line-strong); color: var(--cyan); }
+.iv-src-chip.active {
+  color: var(--cyan); border-color: rgba(34,211,238,.55); background: rgba(34,211,238,.08);
+  box-shadow: 0 0 12px rgba(34,211,238,.16), inset 0 0 10px rgba(34,211,238,.05);
+}
+.iv-pdf-zone { margin-bottom: 13px; display: flex; flex-direction: column; gap: 9px; }
+.iv-pdf-zone.hidden { display: none; }
+.iv-btn-upload {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  font-size: 12.5px; font-weight: 700; padding: 10px 12px; border-radius: 8px;
+  border: 1.5px dashed rgba(34,211,238,.45); background: rgba(34,211,238,.04);
+  color: var(--cyan); cursor: pointer; transition: all .18s;
+}
+.iv-btn-upload:hover { background: rgba(34,211,238,.1); border-style: solid; box-shadow: 0 0 16px rgba(34,211,238,.22); }
+.iv-pdf-card { border: 1px solid rgba(34,211,238,.3); border-radius: 8px; padding: 10px 12px; background: rgba(34,211,238,.05); }
+.iv-pdf-card.hidden { display: none; }
+.iv-pdf-line { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.iv-pdf-name { font-size: 12.5px; font-weight: 800; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.iv-pdf-badge {
+  flex: 0 0 auto; font-family: var(--font-mono); font-size: 9.5px; font-weight: 800; letter-spacing: .06em;
+  color: var(--cyan); border: 1px solid rgba(34,211,238,.4); background: rgba(34,211,238,.08);
+  padding: 2px 8px; border-radius: 4px;
+}
+.iv-pdf-excerpt { font-size: 11.5px; line-height: 1.6; color: var(--ink-2); margin-bottom: 8px; }
+.iv-pdf-del {
+  font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 5px;
+  border: 1px solid rgba(239,68,68,.4); background: rgba(239,68,68,.06); color: #f87171;
+  cursor: pointer; transition: all .15s;
+}
+.iv-pdf-del:hover { background: rgba(239,68,68,.14); box-shadow: 0 0 10px rgba(239,68,68,.2); }
+
+.iv-side {
+  border-right: 1px solid rgba(34,211,238,.14); background: rgba(2,6,23,.45);
+  backdrop-filter: blur(10px);
+  padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+}
+.iv-card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 18px; box-shadow: var(--shadow-sm); position: relative; backdrop-filter: blur(8px);
+}
+.iv-card::before {
+  content: ""; position: absolute; top: -1px; left: -1px; width: 12px; height: 12px;
+  border-top: 1.5px solid var(--cyan); border-left: 1.5px solid var(--cyan); opacity: .7; pointer-events: none;
+}
+.iv-card-title { font-family: var(--font-mono); font-size: 12.5px; font-weight: 800; letter-spacing: .14em; margin-bottom: 14px; color: var(--cyan); text-transform: uppercase; }
+.iv-card-title::before { content: "▸ "; opacity: .7; }
+.iv-label { display: block; font-size: 12.5px; font-weight: 700; color: var(--ink-2); margin-bottom: 12px; }
+.iv-input {
+  width: 100%; margin-top: 5px; padding: 9px 12px; border: 1.5px solid var(--line);
+  border-radius: 7px; font-size: 13.5px; outline: none; font-family: var(--font);
+  color: var(--ink); background: rgba(2,6,23,.6); transition: border-color .15s, box-shadow .15s; resize: vertical;
+}
+.iv-input:focus { border-color: rgba(34,211,238,.55); box-shadow: 0 0 0 3px rgba(34,211,238,.1), 0 0 14px rgba(34,211,238,.12); }
+.iv-input::placeholder { color: #475569; }
+select.iv-input option { background: #0f172a; color: var(--ink); }
+.iv-btn-start, .iv-btn-end {
+  width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-weight: 800; font-size: 14px; padding: 12px 18px; border-radius: 8px; border: none;
+  cursor: pointer; transition: all .2s; margin-top: 4px;
+}
+.iv-btn-start { background: var(--grad); color: #03202b; border: 1px solid rgba(165,243,252,.4); box-shadow: 0 0 20px rgba(34,211,238,.3); }
+.iv-btn-start:hover { transform: translateY(-2px); box-shadow: 0 0 32px rgba(34,211,238,.5); filter: brightness(1.1); }
+.iv-btn-start:active { transform: translateY(0) scale(.985); }
+.iv-btn-start:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+.iv-btn-end { background: rgba(239,68,68,.08); color: #f87171; border: 1.5px solid rgba(239,68,68,.4); margin-top: 10px; }
+.iv-btn-end:hover { background: rgba(239,68,68,.16); box-shadow: 0 0 16px rgba(239,68,68,.25); }
+.iv-config-status { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .05em; margin-top: 10px; min-height: 16px; }
+.iv-config-status.ok { color: #4ade80; } .iv-config-status.err { color: #f87171; } .iv-config-status.busy { color: var(--cyan); }
+
+.iv-tip-card {
+  background: rgba(56,189,248,.06); border: 1px solid rgba(56,189,248,.25); border-radius: var(--radius);
+  padding: 16px; position: relative;
+}
+.iv-tip-card::before {
+  content: ""; position: absolute; bottom: -1px; right: -1px; width: 12px; height: 12px;
+  border-bottom: 1.5px solid #38bdf8; border-right: 1.5px solid #38bdf8; opacity: .7; pointer-events: none;
+}
+.iv-tip-title { font-size: 13px; font-weight: 800; color: #7dd3fc; margin-bottom: 6px; }
+.iv-tip-card p { margin: 0; font-size: 12.5px; line-height: 1.7; color: var(--ink-2); }
+
+/* 右侧对话区 */
+.iv-chat { background: rgba(2,6,23,.35); }
+.iv-turn { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; color: var(--ink-3); font-weight: 600; margin-right: auto; }
+
+/* 面试官 / 候选人气泡（覆盖 ai-create 的配色，贴合面试场景） */
+.msg.iv-ai .msg-avatar { color: #7dd3fc; background: linear-gradient(135deg, rgba(14,165,233,.22), rgba(56,189,248,.12)); border-color: rgba(56,189,248,.45); }
+.msg.iv-ai .msg-bubble { border-left: 3px solid rgba(56,189,248,.6); }
+.msg.iv-user .msg-avatar { color: #fdba74; background: rgba(249,115,22,.12); border: 1px solid rgba(249,115,22,.4); }
+.msg.iv-user .msg-bubble { background: rgba(249,115,22,.14); color: #ffedd5; border-color: rgba(249,115,22,.45); box-shadow: 0 0 14px rgba(249,115,22,.12); }
+
+@media (max-width: 900px) {
+  .iv-main { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .iv-side { border-right: none; border-bottom: 1px solid rgba(34,211,238,.14); max-height: 45vh; }
+}

@@ -1,0 +1,20 @@
+﻿# Python
+backend/.venv/
+backend/**/__pycache__/
+*.py[cod]
+__pycache__/
+
+# Runtime data
+data/resume-files.json
+
+# Env
+.env
+.env.local
+
+# OS
+Thumbs.db
+.DS_Store
+
+# IDE
+.idea/
+.vscode/

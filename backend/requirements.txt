@@ -1,0 +1,28 @@
+# Resume Agent（FastAPI 版）运行依赖
+# 适用：云服务器部署 / 本地 conda 环境启动
+# 安装：pip install -r requirements.txt
+# 之后 PDF 导出还需：python -m playwright install chromium
+
+# ---- Web 框架 ----
+fastapi>=0.110            # FastAPI 入口、路由、StaticFiles、UploadFile
+uvicorn>=0.27             # ASGI 服务器（run.py 用 `python -m uvicorn app.main:app` 启动）
+python-multipart>=0.0.6   # FastAPI 处理 multipart/form-data（PDF 上传：/interview/parse-pdf、/jobs 上传简历）
+
+# ---- 数据校验 / 配置 ----
+pydantic>=2.5             # schemas/resume_models.py 的 BaseModel / Field / ConfigDict
+python-dotenv>=1.0        # config.py 加载根目录或 backend/.env（INTERVIEW_* / OPENAI_* 等）
+
+# ---- LLM / 网络请求 ----
+httpx>=0.27               # llm/client.py 调用 OpenAI 兼容协议（chat / chat_json）
+
+# ---- JSON Schema 校验 ----
+jsonschema>=4.20          # resumes_service.py 用 Draft202012Validator 校验简历 JSON
+
+# ---- PDF 解析（/interview 导入 PDF / 岗位上传 PDF）----
+# PyMuPDF 的导入名是 fitz；抽取文本层，不足时渲染 PNG 交给多模态 OCR
+PyMuPDF>=1.24             # services/pdf_parse.py: import fitz
+
+# ---- PDF 导出（/export/pdf-html 与工作室导出）----
+# 首选 Playwright 无头 Chromium；缺失时自动降级系统 Chrome/Edge --print-to-pdf
+playwright>=1.40          # services/pdf_export.py: from playwright.async_api import async_playwright
+# 安装完依赖后请额外执行：python -m playwright install chromium

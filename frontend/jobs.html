@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>岗位雷达 · Resume Agent</title>
+  <link rel="stylesheet" href="static/css/style.css?v=5" />
+  <link rel="stylesheet" href="static/css/jobs.css?v=5" />
+  <link rel="stylesheet" href="static/css/neon.css?v=5" />
+  <link rel="stylesheet" href="static/css/comic.css?v=5" />
+  <script src="static/js/theme.js?v=5"></script>
+</head>
+<body class="aic-body jobs-body">
+
+  <!-- 顶栏 -->
+  <header class="studio-topbar">
+    <div class="tb-left">
+      <a class="tb-back" href="/" title="返回首页">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+      </a>
+      <span class="tb-logo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><path d="M12 3v4"/><path d="m15.5 8.5 2-2"/></svg>
+      </span>
+      <span class="tb-name">岗位雷达</span>
+      <span class="tb-sub">/ JOBS RADAR</span>
+    </div>
+    <div class="tb-right">
+      <button id="theme-toggle" class="tb-btn" type="button" title="切换视觉风格：深色 HUD ⇄ 奶白 CREAM ⇄ 漫画 COMIC">◐ <span data-theme-label>HUD</span></button>
+      <span class="hud-clock" data-hud-clock title="舰桥时间">--:--:--</span>
+      <button id="btn-settings" class="tb-btn" type="button" title="大模型设置">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        大模型设置
+      </button>
+    </div>
+  </header>
+
+  <main class="jobs-main">
+
+    <!-- 简历来源 -->
+    <section class="card jr-source">
+      <div class="jr-source-left">
+        <div class="jr-source-title">
+          <span class="hud-led cyan"></span> 简历来源 · RESUME SOURCE
+        </div>
+        <div class="jr-source-row">
+          <label class="jr-label" for="resume-select">选择档案</label>
+          <select id="resume-select" class="ipt jr-select">
+            <option value="">—— 未选择简历 ——</option>
+          </select>
+          <span class="jr-src-or">或</span>
+          <button id="btn-jobs-pdf" class="tb-btn" type="button" title="上传简历 PDF，解析后参与匹配">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+            上传简历 PDF
+          </button>
+          <input id="jobs-pdf-input" type="file" accept="application/pdf,.pdf" hidden />
+          <span id="jobs-pdf-badge" class="jr-pdf-badge hidden"></span>
+          <label class="switch" title="开启后自动计算简历与每个岗位的匹配度">
+            <input id="match-toggle" type="checkbox" checked />
+            <span class="switch-track"></span>
+            计算匹配度
+          </label>
+        </div>
+        <div class="jr-source-hint" id="source-hint">选择简历档案或上传简历 PDF 后，系统将自动扫描全部岗位并计算本地匹配度（不调用大模型）。</div>
+      </div>
+      <div class="jr-source-status" id="match-status">
+        <span class="jr-status-dot"></span>
+        <span id="match-status-text">STANDBY · 待命</span>
+      </div>
+    </section>
+
+    <!-- 统计条 -->
+    <section class="jr-stats" id="jr-stats">
+      <div class="jr-stat">
+        <div class="jr-stat-value mono" id="stat-total" data-count="0">0</div>
+        <div class="jr-stat-label">在招岗位 / OPEN ROLES</div>
+      </div>
+      <div class="jr-stat">
+        <div class="jr-stat-value mono" id="stat-salary" data-count="0">0<span class="jr-stat-unit">K</span></div>
+        <div class="jr-stat-label">平均月薪 / AVG SALARY</div>
+      </div>
+      <div class="jr-stat">
+        <div class="jr-stat-value mono" id="stat-best" data-count="0">—</div>
+        <div class="jr-stat-label">最高匹配度 / BEST MATCH</div>
+      </div>
+      <div class="jr-stat">
+        <div class="jr-stat-value mono" id="stat-cities" data-count="0">0</div>
+        <div class="jr-stat-label">覆盖城市 / CITIES</div>
+      </div>
+    </section>
+
+    <!-- 筛选栏 -->
+    <section class="card jr-filter">
+      <div class="jr-filter-row">
+        <div class="jr-search">
+          <svg class="jr-search-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+          <input id="f-keyword" class="ipt" type="text" placeholder="搜索岗位 / 公司 / 技能关键词…" autocomplete="off" />
+        </div>
+        <label class="jr-label" for="f-sort">排序</label>
+        <select id="f-sort" class="ipt jr-select jr-sort">
+          <option value="match">匹配度优先</option>
+          <option value="salary">薪资从高到低</option>
+          <option value="publish" selected>最新发布</option>
+        </select>
+      </div>
+      <div class="jr-chips-row">
+        <span class="jr-chips-key">城市</span>
+        <div class="jr-chips" id="f-cities"></div>
+      </div>
+      <div class="jr-chips-row">
+        <span class="jr-chips-key">类别</span>
+        <div class="jr-chips" id="f-categories"></div>
+      </div>
+    </section>
+
+    <!-- 加载态 -->
+    <div class="jr-loading" id="jobs-loading">
+      <div class="jr-scan-box">
+        <div class="jr-scan-line"></div>
+        <div class="jr-scan-text mono">SCANNING JOB MATRIX…</div>
+      </div>
+    </div>
+
+    <!-- 空态 -->
+    <div class="jr-empty hidden" id="jobs-empty">
+      <div class="jr-empty-ico">🛰️</div>
+      <div class="jr-empty-title">未探测到匹配岗位</div>
+      <div class="jr-empty-sub">试试放宽筛选条件，或清空关键词重新扫描。</div>
+      <button class="tb-btn" id="btn-reset-filter" type="button">重置筛选</button>
+    </div>
+
+    <!-- 岗位卡片列表 -->
+    <section class="jr-grid" id="jobs-list"></section>
+
+  </main>
+
+  <!-- 详情弹窗 -->
+  <div class="jr-modal hidden" id="job-modal">
+    <div class="jr-modal-dialog">
+      <div class="jr-modal-head">
+        <div class="jr-modal-title mono" id="job-modal-code">JD-000</div>
+        <div class="jr-modal-name" id="job-modal-name"></div>
+        <button class="modal-x" id="job-modal-x" type="button" title="关闭">✕</button>
+      </div>
+      <div class="jr-modal-body" id="job-modal-body"></div>
+    </div>
+  </div>
+
+  <script src="static/js/hud.js?v=5"></script>
+  <script src="static/js/settings.js?v=5"></script>
+  <script src="static/js/jobs.js?v=5"></script>
+</body>
+</html>

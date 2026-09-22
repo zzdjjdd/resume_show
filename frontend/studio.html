@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>工作台 · Resume Agent</title>
+    <link rel="stylesheet" href="static/css/style.css?v=5" />
+    <link rel="stylesheet" href="static/css/neon.css?v=5" />
+    <link rel="stylesheet" href="static/css/comic.css?v=5" />
+    <script src="static/js/theme.js?v=5"></script>
+  </head>
+  <body class="studio-body">
+    <!-- 顶栏（深色玻璃，与 landing 统一） -->
+    <header class="studio-topbar">
+      <div class="tb-left">
+        <a class="tb-back" href="/" title="返回首页">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </a>
+        <span class="tb-logo">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
+        </span>
+        <span class="tb-name">Resume Agent</span>
+        <span class="tb-sub">/ 工作台</span>
+      </div>
+      <div class="tb-right">
+        <button id="theme-toggle" class="tb-btn" type="button" title="切换视觉风格：深色 HUD ⇄ 奶白 CREAM ⇄ 漫画 COMIC">◐ <span data-theme-label>HUD</span></button>
+        <span class="hud-clock" data-hud-clock title="舰桥时间">--:--:--</span>
+        <span id="save-status" class="save-pill"><span class="dot"></span><span id="save-status-text">就绪</span></span>
+        <a class="tb-btn" href="/interview">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          AI 面试
+        </a>
+        <a class="tb-btn" href="/jobs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>
+          岗位雷达
+        </a>
+        <button id="btn-settings" class="tb-btn" type="button" title="大模型设置">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          设置
+        </button>
+        <button id="btn-polish" class="tb-btn tb-btn-spark" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 4.8L19 8l-4.6 1.2L12 14l-2.4-4.8L5 8l4.6-1.2z"/></svg>
+          AI 润色
+        </button>
+        <button id="btn-save" class="tb-btn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
+          保存
+        </button>
+        <button id="btn-preview" class="tb-btn tb-btn-primary" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          生成预览
+        </button>
+      </div>
+    </header>
+
+    <div class="studio-main">
+      <!-- 左侧栏 -->
+      <aside class="studio-side">
+        <div class="side-block">
+          <div class="side-head">
+            <span class="side-title">简历档案</span>
+            <button id="btn-new-file" class="side-add" type="button" title="新建简历">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </div>
+          <div id="file-list" class="file-list"></div>
+        </div>
+
+        <div class="side-block">
+          <div class="side-head"><span class="side-title">简历模板</span></div>
+          <div id="tpl-list" class="tpl-list"></div>
+        </div>
+
+        <div class="side-block">
+          <div class="side-head"><span class="side-title">版式设置</span></div>
+          <div class="layout-form">
+            <label class="lf-row">
+              <span class="lf-label">主题色</span>
+              <span class="lf-accent">
+                <select id="accent-preset" class="lf-select">
+                  <option value="#4f46e5">星空蓝（推荐）</option>
+                  <option value="#7c3aed">紫罗兰</option>
+                  <option value="#1e40af">深蓝</option>
+                  <option value="#b42318">酒红</option>
+                  <option value="#0f766e">青绿</option>
+                  <option value="#1f2937">深灰</option>
+                </select>
+                <input id="layout-accent" type="color" class="lf-color" title="自定义主题色" />
+              </span>
+            </label>
+            <label class="lf-row">
+              <span class="lf-label">字体</span>
+              <select id="layout-font" class="lf-select full">
+                <option value="'Source Han Sans SC','Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei','微软雅黑',sans-serif">现代黑体（推荐）</option>
+                <option value="'Source Han Serif SC','Noto Serif SC','Songti SC','SimSun','宋体',serif">优雅宋体</option>
+                <option value="'Kaiti SC','KaiTi','STKaiti','楷体',serif">经典楷体</option>
+                <option value="'FangSong','STFangsong','仿宋',serif">正式仿宋</option>
+                <option value="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">苹方</option>
+              </select>
+            </label>
+            <label class="lf-row">
+              <span class="lf-label">头部对齐</span>
+              <select id="layout-headerstyle" class="lf-select full">
+                <option value="default">左对齐</option>
+                <option value="centered">居中</option>
+              </select>
+            </label>
+            <label class="lf-row">
+              <span class="lf-label">页边距</span>
+              <select id="layout-margin" class="lf-select full">
+                <option value="5">5 mm</option><option value="7">7 mm</option>
+                <option value="9">9 mm</option><option value="11">11 mm</option>
+                <option value="14">14 mm</option><option value="16">16 mm</option>
+              </select>
+            </label>
+            <div class="lf-row col">
+              <div class="lf-range-head"><span class="lf-label">字号</span><span id="fontsize-val" class="lf-val">10.5 pt</span></div>
+              <input id="layout-fontsize" type="range" min="8" max="16" step="0.1" class="lf-range" />
+            </div>
+            <div class="lf-row col">
+              <div class="lf-range-head"><span class="lf-label">行高</span><span id="lineheight-val" class="lf-val">1.45</span></div>
+              <input id="layout-lineheight" type="range" min="1" max="2.2" step="0.05" class="lf-range" />
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 中间编辑区 -->
+      <section class="studio-editor">
+        <div class="editor-scroll">
+          <!-- 角色档案 -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-num">01</span><span class="card-title">角色档案</span>
+            </div>
+            <div class="profile-grid">
+              <div class="profile-fields">
+                <input id="basics-name" data-path="basics.name" class="ipt" placeholder="姓名" />
+                <input id="basics-email" data-path="basics.email" class="ipt" placeholder="邮箱" />
+                <input id="basics-phone" data-path="basics.phone" class="ipt" placeholder="电话" />
+                <input id="basics-location" data-path="basics.location" class="ipt" placeholder="城市" />
+              </div>
+              <div class="profile-photo">
+                <div id="photo-preview" class="photo-preview"><span class="photo-empty">头像</span></div>
+                <button id="btn-photo-pick" class="mini-btn" type="button">选择照片</button>
+                <button id="btn-photo-del" class="mini-btn danger" type="button" disabled>删除</button>
+                <input id="photo-input" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+              </div>
+            </div>
+            <div class="sub-label">附加信息</div>
+            <div class="extra-quick">
+              <button class="chip-btn" data-extra-label="求职状态" data-extra-icon="💼" type="button">＋ 求职状态</button>
+              <button class="chip-btn" data-extra-label="意向岗位" data-extra-icon="🎯" type="button">＋ 意向岗位</button>
+              <button class="chip-btn" data-extra-label="个人网站" data-extra-icon="🔗" type="button">＋ 个人网站</button>
+              <button class="chip-btn" data-extra-label="研究方向" data-extra-icon="🔬" type="button">＋ 研究方向</button>
+            </div>
+            <div id="extra-list" class="extra-list"></div>
+            <button id="btn-add-extra" class="mini-btn" type="button">＋ 新增自定义信息</button>
+            <div class="sub-label" style="margin-top:14px">个人简介</div>
+            <textarea id="basics-summary" data-path="basics.summary" class="ipt ta" rows="3" placeholder="一句话介绍你的专业方向与核心成果"></textarea>
+          </div>
+
+          <!-- 教育经历 -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-num">02</span><span class="card-title">教育经历</span>
+              <button id="btn-add-edu" class="head-add" type="button">＋ 新增</button>
+            </div>
+            <div id="edu-list" class="entry-list"></div>
+          </div>
+
+          <!-- 内容模块 -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-num">03</span><span class="card-title">内容模块</span>
+              <button id="btn-add-section" class="head-add" type="button">＋ 新增模块</button>
+            </div>
+            <p class="card-hint">工作 / 项目 / 科研经历，支持拖拽排序与显示开关</p>
+            <div id="section-list" class="section-list"></div>
+          </div>
+
+          <!-- 技能 -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-num">04</span><span class="card-title">技能</span>
+              <label class="switch"><input id="skills-show" type="checkbox" checked /><span class="switch-track"></span><span class="switch-text">显示</span></label>
+            </div>
+            <input id="skills-input" class="ipt" placeholder="用逗号分隔，如：TypeScript, React, Python" />
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 预览弹窗（完整显示） -->
+    <div id="preview-modal" class="pvmodal hidden">
+      <div class="pvmodal-dialog">
+        <div class="pvmodal-head">
+          <span class="pvmodal-title">📄 简历预览 <span class="a4-badge">A4</span></span>
+          <div class="pv-tools">
+            <select id="pv-tpl" class="pv-select"></select>
+            <button id="pv-pdf" class="tb-btn tb-btn-primary" type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+              导出 PDF
+            </button>
+            <button id="pv-close" class="tb-btn" type="button">关闭</button>
+          </div>
+        </div>
+        <div class="pvmodal-body">
+          <iframe id="pv-frame" class="pv-frame" title="简历预览"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- 润色结果对比面板 -->
+    <div id="polish-compare" class="polish-compare hidden">
+      <div class="pc-head">
+        <span class="pc-title">✨ AI 润色结果</span>
+        <select id="pc-select" class="lf-select"></select>
+        <button id="pc-back" class="mini-btn" type="button">返回</button>
+      </div>
+      <div id="pc-body" class="pc-body"></div>
+    </div>
+
+    <!-- 润色弹窗 -->
+    <div id="polish-modal" class="modal-backdrop hidden">
+      <div class="modal">
+        <div class="modal-head">
+          <span class="modal-title">✨ AI 润色</span>
+          <button id="polish-close" class="modal-x" type="button">✕</button>
+        </div>
+        <label class="sub-label">岗位 JD（可选）</label>
+        <textarea id="polish-jd" class="ipt ta" rows="4" placeholder="粘贴岗位描述，提升润色针对性"></textarea>
+        <div class="sub-label">选择要润色的条目</div>
+        <div id="polish-targets" class="polish-targets"></div>
+        <div class="modal-foot">
+          <span id="polish-error" class="modal-error"></span>
+          <button id="polish-run" class="tb-btn tb-btn-primary" type="button">开始润色</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="static/js/hud.js?v=5"></script>
+    <script src="static/js/settings.js?v=5"></script>
+    <script src="static/js/studio.js?v=5"></script>
+  </body>
+</html>

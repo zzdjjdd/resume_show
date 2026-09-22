@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 一键生成简历 · Resume Agent</title>
+    <link rel="stylesheet" href="static/css/style.css?v=5" />
+    <link rel="stylesheet" href="static/css/ai-create.css?v=5" />
+    <link rel="stylesheet" href="static/css/neon.css?v=5" />
+    <link rel="stylesheet" href="static/css/comic.css?v=5" />
+    <script src="static/js/theme.js?v=5"></script>
+  </head>
+  <body class="aic-body">
+    <!-- 顶栏 -->
+    <header class="aic-topbar">
+      <div class="aic-tb-left">
+        <a class="aic-back" href="/" title="返回首页">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </a>
+        <span class="aic-logo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 4.8L19 8l-4.6 1.2L12 14l-2.4-4.8L5 8l4.6-1.2z"/></svg>
+        </span>
+        <span class="aic-title">AI 一键生成简历</span>
+        <span class="aic-badge">Beta</span>
+      </div>
+      <div class="aic-tb-right">
+        <button id="theme-toggle" class="aic-link" type="button" title="切换视觉风格：深色 HUD ⇄ 奶白 CREAM ⇄ 漫画 COMIC">◐ <span data-theme-label>HUD</span></button>
+        <span class="hud-clock" data-hud-clock title="舰桥时间">--:--:--</span>
+        <button id="btn-settings" class="aic-link" type="button">⚙️ 大模型设置</button>
+        <button id="btn-preview" class="tb-btn tb-btn-primary" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          生成预览
+        </button>
+        <a class="aic-link" href="/interview">AI 面试</a>
+        <a class="aic-link" href="/jobs">岗位雷达</a>
+        <a class="aic-link" href="/studio">进入编辑器</a>
+      </div>
+    </header>
+
+    <div class="aic-main">
+      <!-- 左：对话区 -->
+      <section class="aic-chat">
+        <div id="chat-scroll" class="aic-chat-scroll">
+          <div id="chat-list" class="aic-chat-list"></div>
+          <!-- 快捷开场 -->
+          <div id="quick-wrap" class="aic-quick">
+            <div class="aic-quick-title">不知道怎么开始？选一个场景：</div>
+            <div class="aic-quick-chips">
+              <button class="aic-chip" data-fill="我是一名应届硕士毕业生，计算机专业，想找后端开发的工作。">🎓 应届生求职</button>
+              <button class="aic-chip" data-fill="我有 3 年前端开发经验，想跳槽到一线大厂。">💼 社招跳槽</button>
+              <button class="aic-chip" data-fill="我是研究生，有科研和论文经历，想申请算法岗。">🔬 科研/算法</button>
+              <button class="aic-chip" data-fill="我想从运营转行做产品经理，帮我重新组织经历。">🔄 转行求职</button>
+            </div>
+          </div>
+        </div>
+        <div class="aic-inputbar">
+          <textarea id="chat-input" class="aic-input" rows="2" placeholder="描述你的背景：教育、工作/项目经历、技能、求职目标…（Ctrl+Enter 发送）"></textarea>
+          <div class="aic-input-actions">
+            <button id="btn-generate" class="aic-btn-generate" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              一键生成简历
+            </button>
+            <button id="btn-send" class="aic-btn-send" type="button" title="发送，让 AI 继续追问/完善">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>
+              发送
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 底部状态栏 -->
+      <div id="pv-status" class="aic-pv-status"></div>
+    </div>
+
+    <!-- 简历预览弹窗（与工作台同款，完整显示） -->
+    <div id="preview-modal" class="pvmodal hidden">
+      <div class="pvmodal-dialog">
+        <div class="pvmodal-head">
+          <span class="pvmodal-title">📄 简历预览 <span class="a4-badge">A4</span></span>
+          <div class="pv-tools">
+            <div class="aic-pv-tpl" id="tpl-chips"></div>
+            <button id="btn-redesign" class="tb-btn tb-btn-spark" type="button" title="不满意？让 AI 重新设计两版排版">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+              重新生成
+            </button>
+            <button id="btn-save-file" class="tb-btn" type="button" disabled>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
+              存为档案
+            </button>
+            <button id="btn-pdf" class="tb-btn tb-btn-primary" type="button" disabled>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+              导出 PDF
+            </button>
+            <button id="pv-close" class="tb-btn" type="button">关闭</button>
+          </div>
+        </div>
+        <div class="pvmodal-body">
+          <iframe id="pv-frame" class="pv-frame" title="简历预览"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- 一键生成进度条（阶段式伪进度） -->
+    <div id="gen-progress" class="gen-progress hidden">
+      <div class="gen-prog-panel">
+        <div class="gen-prog-head">
+          <span class="gen-prog-ico">⚡</span>
+          <span id="gen-prog-stage" class="gen-prog-stage">准备中…</span>
+          <span id="gen-prog-pct" class="gen-prog-pct">0%</span>
+        </div>
+        <div class="gen-prog-bar"><div id="gen-prog-fill" class="gen-prog-fill"></div></div>
+        <div class="gen-prog-foot">
+          <span class="gen-prog-tip">保持页面打开，AI 正在全力为你打造简历…</span>
+          <span id="gen-prog-elapsed" class="gen-prog-elapsed">已用时 0s</span>
+        </div>
+      </div>
+    </div>
+
+    <script src="static/js/hud.js?v=5"></script>
+    <script src="static/js/settings.js?v=5"></script>
+    <script src="static/js/ai-create.js?v=5"></script>
+  </body>
+</html>
