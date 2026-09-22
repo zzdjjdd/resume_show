@@ -1,0 +1,10 @@
+Generic single-database configuration for Alembic.
+
+Run migrations against the default DB:
+    alembic upgrade head
+
+Or point at a specific database:
+    MEMORIA_SQLITE_URL="sqlite:///./my.db" alembic upgrade head
+
+Create a new revision after changing memoria/db/models.py:
+    alembic revision --autogenerate -m "describe the change"

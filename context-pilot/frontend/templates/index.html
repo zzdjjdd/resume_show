@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Pilot - 上下文领航员</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="logo">
+                <span class="logo-icon">🚀</span>
+                <span class="logo-text">Context Pilot</span>
+                <span class="logo-sub">上下文领航员</span>
+            </div>
+        </div>
+        <div class="topbar-center">
+            <div class="mode-switch">
+                <button class="mode-btn active" data-mode="chat">💬 聊天模式</button>
+                <button class="mode-btn" data-mode="demo">🎬 演示模式</button>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="icon-btn" id="btnSettings" title="设置">⚙️</button>
+            <button class="icon-btn" id="btnReset" title="重置">🔄</button>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <div class="main-container">
+        <!-- 左侧聊天区 -->
+        <div class="chat-section">
+            <div class="chat-header">
+                <div class="token-info">
+                    <span class="token-label">当前Token:</span>
+                    <span class="token-count" id="tokenCount">0</span>
+                    <span class="token-sep">/</span>
+                    <span class="token-max" id="tokenMax">2048</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">0%</span>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <h2>👋 欢迎使用 Context Pilot</h2>
+                    <p>这是一个用于演示 LLM 上下文管理的交互式系统。开始对话吧！</p>
+                </div>
+            </div>
+
+            <!-- 演示模式控制面板 -->
+            <div class="demo-panel" id="demoPanel" style="display:none;">
+                <div class="demo-stage-tabs" id="demoStageTabs">
+                    <button class="stage-tab active" data-stage="stage1_cache">⚡ 缓存演示</button>
+                    <button class="stage-tab" data-stage="stage2_overflow">📊 溢出处理</button>
+                    <button class="stage-tab" data-stage="stage3_rag_tool">🔍 RAG+工具</button>
+                </div>
+                <div class="demo-content">
+                    <div class="demo-stage-info" id="demoStageInfo"></div>
+                    <div class="demo-step-info" id="demoStepInfo"></div>
+                    <div class="demo-controls">
+                        <button class="btn btn-primary" id="btnDemoNext">下一步 ▶</button>
+                        <button class="btn btn-secondary" id="btnDemoReset">重置</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <textarea id="chatInput" placeholder="输入消息... (Enter发送, Shift+Enter换行)" rows="1"></textarea>
+                    <button id="btnSend" class="btn-send">发送</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧上下文结构面板 -->
+        <div class="sidebar">
+            <div class="sidebar-section collapsible" data-section="context">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">📊 Context 结构</span>
+                    <span class="sidebar-toggle">▼</span>
+                </div>
+                <div class="sidebar-content">
+                    <!-- System Prompt -->
+                    <div class="context-item" data-type="system">
+                        <div class="context-item-header" onclick="toggleContextItem('system')">
+                            <span>🔧 System Prompt (固定)</span>
+                            <span class="context-tokens" id="sysTokens">0</span>
+                        </div>
+                        <div class="context-item-content" id="sysContent" style="display:none;">
+                            <pre class="context-text" id="sysText"></pre>
+                        </div>
+                    </div>
+                    <!-- 对话历史 -->
+                    <div class="context-item" data-type="history">
+                        <div class="context-item-header" onclick="toggleContextItem('history')">
+                            <span>💬 对话历史 (<span id="historyCount">0</span>轮)</span>
+                            <span class="context-tokens" id="historyTokens">0</span>
+                        </div>
+                        <div class="context-item-content" id="historyContent" style="display:none;"></div>
+                    </div>
+                    <!-- RAG 检索 -->
+                    <div class="context-item" data-type="rag">
+                        <div class="context-item-header" onclick="toggleContextItem('rag')">
+                            <span>🔍 RAG 检索结果 (<span id="ragCount">0</span>条)</span>
+                            <span class="context-tokens" id="ragTokens">0</span>
+                        </div>
+                        <div class="context-item-content" id="ragContent" style="display:none;"></div>
+                    </div>
+                    <!-- 工具调用 -->
+                    <div class="context-item" data-type="tools">
+                        <div class="context-item-header" onclick="toggleContextItem('tools')">
+                            <span>🛠️ 工具调用记录 (<span id="toolCount">0</span>次)</span>
+                            <span class="context-tokens" id="toolTokens">0</span>
+                        </div>
+                        <div class="context-item-content" id="toolContent" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section" data-section="cache">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">⚡ Cache 状态</span>
+                </div>
+                <div class="sidebar-content">
+                    <div class="cache-stats">
+                        <div class="cache-stat cache-hit">
+                            <span class="cache-dot">●</span>
+                            <span class="cache-label">命中</span>
+                            <span class="cache-value" id="cacheHits">0</span>
+                            <span class="cache-unit">次</span>
+                        </div>
+                        <div class="cache-stat cache-miss">
+                            <span class="cache-dot">●</span>
+                            <span class="cache-label">未命中</span>
+                            <span class="cache-value" id="cacheMisses">0</span>
+                            <span class="cache-unit">次</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section" data-section="trend">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">📈 Token 趋势</span>
+                </div>
+                <div class="sidebar-content">
+                    <canvas id="trendChart" width="280" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部控制台 -->
+    <div class="bottom-console">
+        <span class="console-label">窗口管理控制台:</span>
+        <span class="console-info" id="consoleInfo">当前窗口: 0%</span>
+        <button class="btn-console" id="btnStrategyDelete">🗑️ 触发删除</button>
+        <button class="btn-console" id="btnStrategySummary">📝 触发摘要</button>
+        <button class="btn-console" id="btnStrategyTrim">🎯 智能裁剪</button>
+    </div>
+
+    <!-- 策略选择弹窗 -->
+    <div class="modal" id="strategyModal" style="display:none;">
+        <div class="modal-overlay" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-icon">⚠️</span>
+                <h3>上下文窗口已满！</h3>
+            </div>
+            <p>当前 Token 使用率: <strong id="modalUsage">100%</strong></p>
+            <p>请选择处理策略：</p>
+            <div class="modal-buttons">
+                <button class="btn-modal btn-delete" id="modalDelete">
+                    <span class="btn-icon">🗑️</span>
+                    <span class="btn-label">删除历史</span>
+                    <span class="btn-desc">保留最近N轮</span>
+                </button>
+                <button class="btn-modal btn-summary" id="modalSummary">
+                    <span class="btn-icon">📝</span>
+                    <span class="btn-label">摘要压缩</span>
+                    <span class="btn-desc">保留意图丢失细节</span>
+                </button>
+                <button class="btn-modal btn-trim" id="modalTrim">
+                    <span class="btn-icon">🎯</span>
+                    <span class="btn-label">智能裁剪</span>
+                    <span class="btn-desc">保留关键信息</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div class="modal" id="settingsModal" style="display:none;">
+        <div class="modal-overlay" onclick="closeSettings()"></div>
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <span class="modal-icon">⚙️</span>
+                <h3>系统设置</h3>
+                <button class="modal-close" onclick="closeSettings()">×</button>
+            </div>
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-tab="llm">🤖 大模型</button>
+                <button class="settings-tab" data-tab="embedding">📐 Embedding</button>
+                <button class="settings-tab" data-tab="mcp">🔌 MCP服务</button>
+                <button class="settings-tab" data-tab="context">📊 上下文</button>
+            </div>
+
+            <div class="settings-content">
+                <!-- LLM 配置 -->
+                <div class="settings-pane active" data-pane="llm">
+                    <div class="form-group">
+                        <label>Base URL</label>
+                        <input type="text" id="llmBaseUrl" placeholder="https://api.minimaxi.com/v1">
+                    </div>
+                    <div class="form-group">
+                        <label>API Key <span id="llmKeyStatus" class="key-status">未配置</span></label>
+                        <input type="password" id="llmApiKey" placeholder="输入API Key">
+                    </div>
+                    <div class="form-group">
+                        <label>模型名称</label>
+                        <input type="text" id="llmModel" placeholder="MiniMax-M3">
+                    </div>
+                    <div class="form-group">
+                        <label>Temperature (0-2)</label>
+                        <input type="number" id="llmTemperature" min="0" max="2" step="0.1" value="0.7">
+                    </div>
+                    <button class="btn-test" data-test="llm">🔌 测试LLM连接</button>
+                    <div class="test-result" id="llmTestResult"></div>
+                </div>
+
+                <!-- Embedding 配置 -->
+                <div class="settings-pane" data-pane="embedding">
+                    <div class="form-group">
+                        <label>Base URL</label>
+                        <input type="text" id="embBaseUrl" placeholder="https://api.siliconflow.cn/v1">
+                    </div>
+                    <div class="form-group">
+                        <label>API Key <span id="embKeyStatus" class="key-status">未配置</span></label>
+                        <input type="password" id="embApiKey" placeholder="输入API Key">
+                    </div>
+                    <div class="form-group">
+                        <label>模型名称</label>
+                        <input type="text" id="embModel" placeholder="Qwen/Qwen3-Embedding-4B">
+                    </div>
+                    <button class="btn-test" data-test="embedding">🔌 测试Embedding连接</button>
+                    <div class="test-result" id="embTestResult"></div>
+                </div>
+
+                <!-- MCP 配置 -->
+                <div class="settings-pane" data-pane="mcp">
+                    <div class="form-group">
+                        <label>MCP 服务 URL <span id="mcpKeyStatus" class="key-status">未配置</span></label>
+                        <input type="text" id="mcpUrl" placeholder="https://mcp.example.com/amap（演示模式可留空）">
+                    </div>
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="password" id="mcpApiKey" placeholder="输入API Key（演示模式可留空）">
+                    </div>
+                    <div class="form-group">
+                        <p class="hint">💡 提示：演示模式已内置模拟数据，无需配置 MCP 即可体验工具调用效果。配置真实 MCP 后将调用真实接口。</p>
+                    </div>
+                    <div class="mcp-tools-list">
+                        <h4>可用工具 (高德地图):</h4>
+                        <ul id="mcpToolsList"></ul>
+                    </div>
+                    <button class="btn-test" data-test="mcp">🔌 测试MCP连接</button>
+                    <div class="test-result" id="mcpTestResult"></div>
+                </div>
+
+                <!-- 上下文配置 -->
+                <div class="settings-pane" data-pane="context">
+                    <div class="form-group">
+                        <label>上下文窗口大小 (Token)</label>
+                        <input type="number" id="contextWindow" min="512" max="32000" value="2048">
+                    </div>
+                    <p class="hint">设置上下文窗口的最大 Token 数。当使用率超过100%时，需要执行处理策略。</p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeSettings()">取消</button>
+                <button class="btn btn-primary" id="btnSaveSettings">保存设置</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

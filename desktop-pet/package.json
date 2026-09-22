@@ -1,0 +1,38 @@
+{
+  "name": "baobei-desktop-pet",
+  "version": "1.0.0",
+  "description": "圆脸微胖·侧面麻花辫·牛仔背带裤 桌面宠物（SVG 版，无需 Live2D 素材）",
+  "main": "dist/main.js",
+  "author": "zzdjjdd",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zzdjjdd/desktop-pet.git"
+  },
+  "keywords": [
+    "electron",
+    "desktop-pet",
+    "typescript",
+    "svg",
+    "windows"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && electron .",
+    "dev": "tsc -w",
+    "pack:dir": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "dist:portable": "npm run build && electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.5.0"
+  },
+  "allowScripts": {
+    "electron@31.7.7": true
+  }
+}

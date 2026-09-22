@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>设计 Token 预览 · AI 智行助手</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <style>
+    .preview {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 64px 24px 96px;
+    }
+    .preview h2 {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      margin: 56px 0 16px;
+      letter-spacing: -0.01em;
+    }
+    .preview h2 small {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .swatch {
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--bg-elevated);
+    }
+    .swatch__chip {
+      height: 88px;
+    }
+    .swatch__meta {
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+    .swatch__name {
+      color: var(--fg-strong);
+      font-size: 12px;
+      margin-bottom: 2px;
+      font-family: var(--font-sans);
+    }
+    .type-sample {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 16px;
+    }
+    .type-sample .label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--fg-muted);
+      margin-bottom: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .scene-mini {
+      position: relative;
+      min-height: 360px;
+      display: flex;
+      align-items: center;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 16px;
+      border: 1px solid var(--border-default);
+    }
+    .scene-mini__bg {
+      position: absolute; inset: 0; z-index: 0;
+    }
+    .scene-mini__bg--gradient { background: var(--grad-stage); }
+    .scene-mini__bg--spotlight {
+      background:
+        radial-gradient(ellipse at 30% 20%, var(--accent-soft) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, var(--violet-soft) 0%, transparent 60%);
+    }
+    .scene-mini__bg--grid {
+      background-image:
+        linear-gradient(var(--border-faint) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-faint) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
+    }
+    .scene-mini__content {
+      position: relative; z-index: 1;
+      padding: 36px;
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 720px) { .row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="preview">
+    <h1 class="display" style="font-size: 40px; margin-bottom: 8px;">设计 Token · 预览</h1>
+    <p class="muted" style="margin-bottom: 32px;">
+      这是 <strong>阶段 1</strong> 的产物:深色科技感 + Scrollytelling 风格的色板、字体、间距、动效、布局原子。
+      请你重点检查以下三组是否符合预期,然后我们才进入阶段 2(首页骨架)。
+    </p>
+
+    <!-- 1. 调色板 -->
+    <h2><small>01 · Palette</small>调色板(深色科技感)</h2>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="swatch__chip" style="background: var(--bg-canvas);"></div>
+        <div class="swatch__meta"><div class="swatch__name">bg-canvas</div>#0B0D12 · 章节底色</div></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--bg-page);"></div>
+        <div class="swatch__meta"><div class="swatch__name">bg-page</div>#0E1015 · 页面底色</div></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--bg-elevated);"></div>
+        <div class="swatch__meta"><div class="swatch__name">bg-elevated</div>#161922 · 卡片</div></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--bg-muted);"></div>
+        <div class="swatch__meta"><div class="swatch__name">bg-muted</div>#1D2130 · 次级</div></div>
+      <div class="swatch" style="color: #06121C;"><div class="swatch__chip" style="background: var(--accent);"></div>
+        <div class="swatch__meta"><div class="swatch__name">accent</div>#5BC8FF · 电光蓝</div></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--cyan);"></div>
+        <div class="swatch__meta"><div class="swatch__name">cyan</div>#6EE7E1 · 副高亮</div></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--violet);"></div>
+        <div class="swatch__meta"><div class="swatch__name">violet</div>#B197FC · 章节切换点</div></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--gold);"></div>
+        <div class="swatch__meta"><div class="swatch__name">gold</div>#F2C572 · 极少量提示</div></div>
+    </div>
+
+    <!-- 2. 字体 -->
+    <h2><small>02 · Typography</small>字体与排版</h2>
+    <div class="type-sample">
+      <div class="label">display / serif · 大标题</div>
+      <div class="display" style="font-size: 48px; line-height: 1.1; margin-bottom: 8px;">智能出行,一念即达。</div>
+      <div class="muted mono" style="font-size: 11px;">--fs-4xl · 48–96px clamp</div>
+    </div>
+    <div class="row">
+      <div class="type-sample">
+        <div class="label">h2 / serif</div>
+        <h2 style="margin: 0;">像翻一本旅行札记,每翻一页都更近一程。</h2>
+      </div>
+      <div class="type-sample">
+        <div class="label">body / sans</div>
+        <p style="font-size: 15px; line-height: 1.7; color: var(--fg-default);">
+          滚动是唯一的主要交互方式。内容随滚动进度触发淡入、位移、缩放或视差移动,
+          动画时长控制在 250–600ms,使用 ease-out 曲线确保流畅自然。
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="type-sample">
+        <div class="label">kicker / mono · 章节小标</div>
+        <span class="kicker">Scene 01 / 旅程开始</span>
+        <p class="muted" style="margin-top: 12px; font-size: 13px;">— 12px · 0.18em letter-spacing · accent 色</p>
+      </div>
+      <div class="type-sample">
+        <div class="label">tag · 状态标签</div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+          <span class="tag">默认</span>
+          <span class="tag accent">accent</span>
+          <span class="tag cyan">cyan</span>
+          <span class="tag violet">violet</span>
+          <span class="tag gold">gold</span>
+        </div>
+        <p class="muted" style="font-size: 13px;">用 accent 表达主操作,cyan/violet 表达章节身份,gold 克制使用</p>
+      </div>
+    </div>
+
+    <!-- 3. 按钮 -->
+    <h2><small>03 · Buttons</small>按钮</h2>
+    <div class="type-sample">
+      <div class="btn-row">
+        <button class="btn">普通按钮</button>
+        <button class="btn btn--ghost">Ghost</button>
+        <button class="btn btn--accent">主操作 · accent</button>
+        <button class="btn btn--lg btn--accent">Large · accent</button>
+        <button class="btn btn--icon" aria-label="icon">⌘</button>
+      </div>
+    </div>
+
+    <!-- 4. 分镜背景 -->
+    <h2><small>04 · Scene Backgrounds</small>分镜背景(为阶段 2 准备)</h2>
+    <p class="muted" style="margin-bottom: 12px;">每个 .scene 100vh,3 种可复用背景:渐变 / 聚光 / 网格</p>
+
+    <div class="scene-mini">
+      <div class="scene-mini__bg scene-mini__bg--gradient"></div>
+      <div class="scene-mini__content">
+        <span class="kicker">A · Gradient</span>
+        <h3 style="font-size: 24px; margin-bottom: 6px;">从上到下的章节过渡</h3>
+        <p class="muted">--grad-stage · 用在章节与章节之间</p>
+      </div>
+    </div>
+
+    <div class="scene-mini">
+      <div class="scene-mini__bg scene-mini__bg--spotlight"></div>
+      <div class="scene-mini__content">
+        <span class="kicker">B · Spotlight</span>
+        <h3 style="font-size: 24px; margin-bottom: 6px;">双色聚光,聚焦主画面</h3>
+        <p class="muted">radial-gradient · 用在 Hero、关键概念卡</p>
+      </div>
+    </div>
+
+    <div class="scene-mini">
+      <div class="scene-mini__bg scene-mini__bg--grid"></div>
+      <div class="scene-mini__content">
+        <span class="kicker">C · Grid</span>
+        <h3 style="font-size: 24px; margin-bottom: 6px;">科技网格 · mask 渐隐到边缘</h3>
+        <p class="muted">64px 网格 + 椭圆 mask · 用在数据/技术章节</p>
+      </div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid var(--border-default); margin: 56px 0;" />
+    <p class="muted" style="text-align: center; font-size: 13px;">
+      阶段 1 完。下一阶段:用以上 token 搭真正的分镜式首页骨架(100vh · sticky · IntersectionObserver)。
+    </p>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+</body>
+</html>

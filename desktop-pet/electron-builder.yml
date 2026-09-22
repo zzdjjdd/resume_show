@@ -1,0 +1,40 @@
+appId: com.zzdjjdd.baobei.pet
+productName: 宝贝桌面宠物
+copyright: Copyright © 2026 zzdjjdd
+
+directories:
+  output: release
+  buildResources: build
+
+# 把编译后的主进程/预加载 与 渲染层静态资源 一起打包
+files:
+  - dist/**/*
+  - renderer/**/*
+  - package.json
+
+# 角色素材（未来热替换的模型/图片等）放 resources，随包携带且可被外部覆盖
+extraResources:
+  - from: resources
+    to: resources
+    filter:
+      - "**/*"
+
+win:
+  # 未签名便携/安装包：关闭 rcedit 改写与签名步骤，避免拉取 winCodeSign 工具包
+  # （该工具包内含 macOS 符号链接，在无“创建符号链接”权限的 Windows 上会解压失败）。
+  signAndEditExecutable: false
+  target:
+    - target: nsis        # 安装包
+      arch: [x64]
+    - target: portable    # 便携版单文件 exe
+      arch: [x64]
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: 宝贝桌面宠物
+
+portable:
+  artifactName: 宝贝桌面宠物-便携版.exe

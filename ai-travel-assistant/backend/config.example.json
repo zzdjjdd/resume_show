@@ -1,0 +1,26 @@
+{
+  "llm": {
+    "api_key": "",
+    "base_url": "https://api.minimaxi.com/v1",
+    "model": "MiniMax-M3",
+    "reasoning_split": true
+  },
+  "amap": {
+    "sse_url": "https://mcp.amap.com/v1/sse",
+    "api_key": ""
+  },
+  "mcp": {
+    "servers": [
+      {
+        "name": "12306",
+        "url": "",
+        "enabled": false
+      },
+      {
+        "name": "hotel",
+        "url": "",
+        "enabled": false
+      }
+    ]
+  }
+}

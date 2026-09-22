@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "memoria"
+version = "0.1.0"
+description = "Embedded short-term + long-term memory module for agent applications"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "SQLAlchemy>=2.0",
+]
+
+[project.optional-dependencies]
+# Embedding / vector / migration backends are optional and lazily imported,
+# so the core package stays installable and testable offline.
+local = ["sentence-transformers>=2.2"]
+openai = ["openai>=1.0"]
+vector = ["chromadb>=0.4"]
+alembic = ["alembic>=1.12"]
+web = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "mcp>=1.2", "python-dotenv>=1.0"]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=4",
+    "ruff>=0.4",
+    "mypy>=1.8",
+    "alembic>=1.12",
+]
+
+[tool.setuptools.packages.find]
+include = ["memoria*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.11"
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_redundant_casts = true
+ignore_missing_imports = true

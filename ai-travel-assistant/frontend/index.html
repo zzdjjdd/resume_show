@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 智行助手 · 端云协同的智能出行体验</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <!-- 背景装饰 -->
+  <div class="aurora-bg" aria-hidden="true">
+    <div class="aurora aurora-1"></div>
+    <div class="aurora aurora-2"></div>
+    <div class="aurora aurora-3"></div>
+    <div class="noise"></div>
+  </div>
+
+  <!-- 顶部导航 -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11 L16 4 L29 11 L29 22 L16 29 L3 22 Z" />
+          <path d="M3 11 L16 18 L29 11" />
+          <path d="M16 18 L16 29" />
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">AI 智行助手</div>
+        <div class="brand-sub">端云协同 · 高德 MCP · 智能出行</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn" data-tab="travel">🧭 旅游模式</button>
+      <button class="nav-btn" data-tab="chat">💬 日常聊天</button>
+      <button class="nav-btn" data-tab="settings">⚙️ 设置</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ==================== 旅游模式 ==================== -->
+    <section class="view active" id="view-travel">
+      <div class="hero">
+        <div class="badge-pill">智能行程规划</div>
+        <h1 class="hero-title">把<span>出发地</span>与<span>目的地</span>交给我，<br />让我把<span>路上每一站</span>都想好</h1>
+        <p class="hero-sub">基于大模型 + 高德地图 MCP，支持智能场景标签、实时路况与充电/餐饮偏好。</p>
+      </div>
+
+      <div class="grid two">
+        <!-- 左侧：表单卡片 -->
+        <div class="card glass form-card">
+          <h2 class="card-title">🧭 出行需求</h2>
+          <form id="travel-form" class="form">
+            <div class="row two">
+              <div class="field">
+                <label>出发地</label>
+                <input type="text" name="origin" placeholder="例如：北京·中关村" required />
+              </div>
+              <div class="field">
+                <label>目的地</label>
+                <input type="text" name="destination" placeholder="例如：上海·陆家嘴" required />
+              </div>
+            </div>
+
+            <div class="row two">
+              <div class="field">
+                <label>旅游天数</label>
+                <input type="number" name="days" min="1" max="30" value="2" />
+              </div>
+              <div class="field">
+                <label>人数</label>
+                <input type="number" name="people" min="1" max="50" value="2" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label>兴趣偏好（可多选）</label>
+              <div class="chips" id="pref-chips">
+                <label class="chip"><input type="checkbox" value="人文历史"/><span>🏛 人文历史</span></label>
+                <label class="chip"><input type="checkbox" value="美食体验"/><span>🍜 美食体验</span></label>
+                <label class="chip"><input type="checkbox" value="自然风光"/><span>🌄 自然风光</span></label>
+                <label class="chip"><input type="checkbox" value="现代都市"/><span>🏙 现代都市</span></label>
+                <label class="chip"><input type="checkbox" value="休闲度假"/><span>🌴 休闲度假</span></label>
+                <label class="chip"><input type="checkbox" value="文艺体验"/><span>🎨 文艺体验</span></label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>其他要求 / 备注</label>
+              <textarea name="extra" rows="3" placeholder="例如：新能源自驾、需中途充电、优先高速、避开拥堵..."></textarea>
+            </div>
+
+            <label class="toggle">
+              <input type="checkbox" name="use_map" checked />
+              <span class="toggle-track"><span class="toggle-dot"></span></span>
+              <span>借助高德地图获取两地距离与天气（如已配置 API Key）</span>
+            </label>
+
+            <div class="actions">
+              <button type="submit" class="btn primary">✨ 生成行程计划</button>
+              <button type="button" class="btn ghost" id="btn-copy">复制 Markdown</button>
+              <button type="button" class="btn ghost" id="btn-download">下载 .md 文件</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- 右侧：预览 -->
+        <div class="card glass preview" id="preview-card">
+          <div class="preview-head">
+            <h2 class="card-title">📅 行程预览</h2>
+            <div class="preview-actions">
+              <div class="preview-meta" id="preview-meta">尚未生成</div>
+              <button type="button" class="btn ghost small preview-toggle" id="btn-toggle-preview" title="展开预览，给内容更多面积">
+                <span class="pt-icon">⛶</span>
+                <span class="pt-label">展开</span>
+              </button>
+            </div>
+          </div>
+          <div class="md-output" id="md-output">
+            <div class="empty-state">
+              <div class="empty-icon">🗺️</div>
+              <div>填写左侧表单后，点击「生成行程计划」即可在此查看 Markdown 行程。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 聊天模式 ==================== -->
+    <section class="view" id="view-chat">
+      <div class="hero compact">
+        <div class="badge-pill">日常聊天</div>
+        <h1 class="hero-title">问我任何<span>出行</span>、<span>地点</span>、<span>天气</span>的问题</h1>
+        <p class="hero-sub">我会在需要时调用高德地图 MCP，工具结果会一并呈现在对话中。</p>
+      </div>
+
+      <div class="card glass chat-card">
+        <div class="chat-toolbar">
+          <button class="btn ghost small" id="btn-clear-chat">清空对话</button>
+          <div class="chat-hint" id="chat-status">模型：未连接</div>
+        </div>
+        <div class="chat-window" id="chat-window">
+          <div class="msg from-system">
+            <div class="msg-bubble">
+              👋 你好！我可以帮你查天气、找景点、规划路线、生成行程，也可以陪你闲聊。让我看看能为你做点什么？
+            </div>
+          </div>
+        </div>
+        <form id="chat-form" class="chat-input">
+          <input type="text" id="chat-text" placeholder="试试：从北京自驾到上海，要经过哪些服务区？沿途天气如何？" autocomplete="off" />
+          <button type="submit" class="btn primary">发送</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==================== 设置 ==================== -->
+    <section class="view" id="view-settings">
+      <div class="hero compact">
+        <div class="badge-pill">系统设置</div>
+        <h1 class="hero-title">把<span>你的 AI</span> 与 <span>地图</span> 都接好</h1>
+        <p class="hero-sub">所有配置保存在本地后端，仅本机使用。</p>
+      </div>
+
+      <div class="grid two">
+        <!-- LLM -->
+        <div class="card glass">
+          <h2 class="card-title">🤖 LLM 服务（OpenAI 兼容）</h2>
+          <div class="field">
+            <label>API Key</label>
+            <input type="password" id="llm-key" placeholder="sk-..." />
+          </div>
+          <div class="field">
+            <label>Base URL</label>
+            <input type="text" id="llm-base" placeholder="https://api.openai.com/v1" />
+          </div>
+          <div class="field">
+            <label>模型名</label>
+            <input type="text" id="llm-model" placeholder="gpt-4o-mini / qwen-plus / deepseek-chat ..." />
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="btn-save-llm">保存</button>
+            <button class="btn ghost" id="btn-test-llm">测试连接</button>
+            <span class="test-result" id="test-llm-result"></span>
+          </div>
+        </div>
+
+        <!-- 高德 -->
+        <div class="card glass">
+          <h2 class="card-title">🗺️ 高德地图 MCP / 开放平台</h2>
+          <div class="field">
+            <label>SSE 服务 URL（MCP）</label>
+            <input type="text" id="amap-sse" placeholder="例如：https://mcp.example.com/sse" />
+          </div>
+          <div class="field">
+            <label>API Key（开放平台 Web 服务 JS API Key）</label>
+            <input type="password" id="amap-key" placeholder="高德开放平台 Key" />
+          </div>
+          <p class="hint">说明：聊天中的"工具调用"会以后端封装的高德 Web 接口形式执行；SSE URL 作为 MCP 上游配置保存，便于扩展。</p>
+          <div class="actions">
+            <button class="btn primary" id="btn-save-amap">保存</button>
+            <button class="btn ghost" id="btn-test-amap">测试连接</button>
+            <span class="test-result" id="test-amap-result"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card glass" style="margin-top: 20px">
+        <h2 class="card-title">🔌 MCP 服务器（SSE-over-JSON-RPC）</h2>
+        <p class="hint">通过标准 MCP 协议连接任意 MCP server。仅需填写服务 URL，工具列表由 server 自动声明。默认预填 12306（火车票）与酒店（搜索与推荐）两条占位，启用后会以 <code>{name}__</code> 前缀暴露给 LLM。</p>
+        <div id="mcp-list"></div>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="btn-add-mcp">+ 添加服务器</button>
+          <button type="button" class="btn primary" id="btn-save-mcp">保存全部</button>
+          <span class="test-result" id="test-mcp-result"></span>
+        </div>
+      </div>
+
+      <div class="card glass" style="margin-top: 20px">
+        <h2 class="card-title">📖 使用提示</h2>
+        <ul class="usage-list">
+          <li>先到「设置」填写 LLM 与高德的凭据。</li>
+          <li>「旅游模式」用于一次性生成可下载的 Markdown 行程表。</li>
+          <li>「日常聊天」支持工具调用 — 例如询问"今天上海天气怎么样？"会自动调用天气接口。</li>
+          <li>聊天模式下，单次对话最多可触发 5 轮工具调用。</li>
+          <li>启用 MCP 服务器后，聊天时 LLM 会自动发现并调用其中的工具；调用结果会标注「🔌 来自 xxx MCP」。</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    AI 智行助手 · 仅作演示用途 · 端云协同 / FastAPI / 高德地图
+  </footer>
+
+  <!-- markdown 渲染 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

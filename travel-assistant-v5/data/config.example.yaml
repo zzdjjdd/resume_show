@@ -1,0 +1,30 @@
+# Copy to data/config.yaml and fill in your own credentials.
+# data/config.yaml is gitignored - never commit real keys.
+#
+# Or just start the app and fill everything in through the 「设置」 page,
+# which writes data/config.yaml for you.
+
+llm:
+  api_key: ""
+  base_url: https://api.deepseek.com
+  model: deepseek-v4-pro
+  timeout: 60
+
+amap:
+  # 高德「Web 服务」Key（不是「Web 端 JS API」Key）
+  api_key: ""
+  sse_url: https://mcp.amap.com/v1/sse
+
+# 可选：任意外部 MCP server（如 12306 / 酒店查询）
+mcp:
+  server_url: ""
+  enabled: false
+  timeout: 30
+
+mcp2:
+  server_url: ""
+  enabled: false
+  timeout: 30
+
+ui:
+  theme: auto

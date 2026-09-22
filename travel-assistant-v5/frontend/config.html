@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="auto">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>设置 · AI 智行助手</title>
+  <link rel="stylesheet" href="/static/assets/css/main.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23c8423c'/%3E%3Ctext x='50' y='66' font-size='58' text-anchor='middle' fill='white' font-family='PingFang SC,sans-serif' font-weight='600'%3E设%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <div class="scroll-progress" id="scroll-progress"></div>
+
+  <header class="topnav">
+    <a href="/" class="topnav__brand">
+      <span class="topnav__logo">智</span>
+      <span>AI 智行助手</span>
+    </a>
+    <nav class="topnav__links">
+      <a class="topnav__link" href="/"><span class="topnav__link--label">首页</span></a>
+      <a class="topnav__link" href="/plan"><span class="topnav__link--label">旅游模式</span></a>
+      <a class="topnav__link" href="/chat"><span class="topnav__link--label">日常聊天</span></a>
+      <a class="topnav__link is-active" href="/config"><span class="topnav__link--label">设置</span></a>
+    </nav>
+    <div class="topnav__tools">
+      <button class="theme-toggle" id="theme-toggle" title="切换主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="page-hero container reveal">
+    <span class="kicker">配置</span>
+    <h1 class="serif">填好钥匙，出发更顺。</h1>
+    <p class="muted">LLM API 与高德 Map Key 仅存储在本地 <code>data/config.yaml</code>，不会被上传到任何第三方服务器。</p>
+  </section>
+
+  <main class="container" style="max-width: 760px; padding-bottom: 80px;">
+    <!-- LLM 配置 -->
+    <article class="card reveal" style="margin-bottom: 24px;">
+      <h3 style="font-family: var(--font-serif); font-size: 22px; margin-bottom: 6px;">① LLM 模型服务</h3>
+      <p class="muted" style="font-size: 14px; margin-bottom: 24px;">支持任意 OpenAI 兼容接口（含 DeepSeek、MiniMax、硅基流动等）。</p>
+
+      <div class="field">
+        <label>API Key</label>
+        <div class="input-group">
+          <input id="llm-key" class="input" type="password" placeholder="sk-..." autocomplete="off" />
+          <button class="input-action" id="toggle-llm-key" type="button">显示</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Base URL</label>
+        <input id="llm-url" class="input" placeholder="https://api.openai.com/v1" />
+      </div>
+
+      <div class="field">
+        <label>Model</label>
+        <div class="input-group">
+          <select id="llm-model" class="select">
+            <option value="">— 加载中 —</option>
+          </select>
+          <input id="llm-model-input" class="input" placeholder="或手动输入模型名（如 gpt-4o-mini）" />
+          <button class="input-action" id="refresh-models" type="button">↻ 获取模型</button>
+        </div>
+        <span class="muted" style="font-size:12px;">点击「获取模型」可下拉选择；也可手动填入。</span>
+      </div>
+
+      <div class="field">
+        <label>请求超时（秒）</label>
+        <input id="llm-timeout" class="input" type="number" value="60" min="10" max="600" />
+      </div>
+
+      <div style="display:flex; gap: 10px;">
+        <button class="btn btn--accent" id="test-llm">测试连接</button>
+        <button class="btn" id="save-llm">保存 LLM 配置</button>
+        <span id="llm-status" class="muted" style="align-self:center;"></span>
+      </div>
+    </article>
+
+    <!-- 高德配置 -->
+    <article class="card reveal" style="margin-bottom: 24px;">
+      <h3 style="font-family: var(--font-serif); font-size: 22px; margin-bottom: 6px;">② 高德地图 API</h3>
+      <p class="muted" style="font-size: 14px; margin-bottom: 24px;">用于路径规划、POI、天气、地理编码。可到 <a href="https://lbs.amap.com/" target="_blank">lbs.amap.com</a> 申请「Web 端」Key。</p>
+
+      <div class="field">
+        <label>高德 API Key</label>
+        <div class="input-group">
+          <input id="amap-key" class="input" type="password" placeholder="高德 Web 服务 Key" autocomplete="off" />
+          <button class="input-action" id="toggle-amap-key" type="button">显示</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>高德 MCP SSE 服务 URL（可选，仅展示用）</label>
+        <input id="amap-sse" class="input" placeholder="https://mcp.amap.com/v1/sse" />
+        <span class="muted" style="font-size:12px;">本项目通过 REST API 直接调用，等价于 MCP 工具语义。</span>
+      </div>
+
+      <div style="display:flex; gap: 10px;">
+        <button class="btn btn--accent" id="test-amap">测试连接</button>
+        <button class="btn" id="save-amap">保存高德配置</button>
+        <span id="amap-status" class="muted" style="align-self:center;"></span>
+      </div>
+    </article>
+
+    <!-- 外部 MCP 配置 -->
+    <article class="card reveal" style="margin-bottom: 24px;">
+      <h3 style="font-family: var(--font-serif); font-size: 22px; margin-bottom: 6px;">③ 外部 MCP 服务 · 1</h3>
+      <p class="muted" style="font-size: 14px; margin-bottom: 24px;">支持任意标准 MCP 端点(例如 ModelScope / 12306 / 酒店服务)。填入 URL 并启用后,LLM 可自动调用其工具,工具名会自动加 <code style="color: var(--accent);">mc_</code> 前缀。</p>
+
+      <div class="field">
+        <label>MCP Server URL</label>
+        <input id="mcp-url" class="input" placeholder="https://mcp.example.com/.../mcp" autocomplete="off" />
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="field">
+          <label>请求超时（秒）</label>
+          <input id="mcp-timeout" class="input" type="number" value="30" min="5" max="120" />
+        </div>
+        <div class="field">
+          <label>启用</label>
+          <label style="display:flex; align-items:center; gap: 8px; padding: 11px 0; cursor: pointer;">
+            <input id="mcp-enabled" type="checkbox" style="width: 18px; height: 18px; accent-color: var(--accent);" />
+            <span>启用 MCP(必须勾选才会连接)</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn btn--accent" id="test-mcp">测试连接</button>
+        <button class="btn" id="refresh-mcp">刷新工具列表</button>
+        <button class="btn" id="save-mcp">保存 MCP 配置</button>
+        <span id="mcp-status" class="muted" style="align-self:center;"></span>
+      </div>
+
+      <div id="mcp-tools-box" style="display:none; margin-top: 20px; padding: 16px; background: var(--bg-muted); border-radius: var(--radius-md); border: 1px solid var(--border-default);">
+        <div style="font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin-bottom: 8px;">已加载工具 <span id="mcp-tools-count">0</span> 个</div>
+        <div id="mcp-tools-list" style="display:flex; flex-wrap: wrap; gap: 6px;"></div>
+      </div>
+    </article>
+
+    <!-- 外部 MCP 服务 2 -->
+    <article class="card reveal" style="margin-bottom: 24px;">
+      <h3 style="font-family: var(--font-serif); font-size: 22px; margin-bottom: 6px;">④ 外部 MCP 服务 · 2</h3>
+      <p class="muted" style="font-size: 14px; margin-bottom: 24px;">第二个外部 MCP 端点。当前支持<strong>保存与连接测试</strong>;接入聊天(与服务 1 工具合并调用)为后续能力。</p>
+
+      <div class="field">
+        <label>MCP Server URL</label>
+        <input id="mcp2-url" class="input" placeholder="https://mcp.example.com/.../mcp" autocomplete="off" />
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="field">
+          <label>请求超时（秒）</label>
+          <input id="mcp2-timeout" class="input" type="number" value="30" min="5" max="120" />
+        </div>
+        <div class="field">
+          <label>启用</label>
+          <label style="display:flex; align-items:center; gap: 8px; padding: 11px 0; cursor: pointer;">
+            <input id="mcp2-enabled" type="checkbox" style="width: 18px; height: 18px; accent-color: var(--accent);" />
+            <span>启用 MCP 2</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn btn--accent" id="test-mcp2">测试连接</button>
+        <button class="btn" id="save-mcp2">保存 MCP 2 配置</button>
+        <span id="mcp2-status" class="muted" style="align-self:center;"></span>
+      </div>
+
+      <div id="mcp2-tools-box" style="display:none; margin-top: 20px; padding: 16px; background: var(--bg-muted); border-radius: var(--radius-md); border: 1px solid var(--border-default);">
+        <div style="font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin-bottom: 8px;">已加载工具 <span id="mcp2-tools-count">0</span> 个</div>
+        <div id="mcp2-tools-list" style="display:flex; flex-wrap: wrap; gap: 6px;"></div>
+      </div>
+    </article>
+
+    <!-- 主题 + 全量保存 -->
+    <article class="card reveal">
+      <h3 style="font-family: var(--font-serif); font-size: 22px; margin-bottom: 6px;">⑤ 偏好</h3>
+      <div class="field">
+        <label>主题</label>
+        <select id="theme" class="select">
+          <option value="auto">跟随系统</option>
+          <option value="light">浅色</option>
+          <option value="dark">深色</option>
+        </select>
+      </div>
+      <button class="btn" id="save-all">保存全部配置</button>
+      <span id="all-status" class="muted" style="margin-left: 12px;"></span>
+    </article>
+  </main>
+
+  <footer class="foot container">
+    <p class="muted">遇到问题？参考 <a href="/docs/USAGE.md">使用手册</a> 中的「故障排查」。</p>
+  </footer>
+
+  <script src="/static/assets/js/common.js"></script>
+  <script src="/static/assets/js/pages/config.js"></script>
+</body>
+</html>

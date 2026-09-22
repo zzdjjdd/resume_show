@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEMORIA · 给 Agent 一颗会记住的大脑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=ZCOOL+QingKe+HuangYou&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============ DESIGN TOKENS ============ */
+:root{
+  --ink:#141514;
+  --paper:#FAF5EA;
+  --white:#FFFDF8;
+  --pink:#FF5D8F;
+  --yellow:#FFD319;
+  --blue:#2E6BFF;
+  --green:#00C853;
+  --bd:3px solid var(--ink);
+  --bd4:4px solid var(--ink);
+  --sh:5px 5px 0 var(--ink);
+  --sh-lg:8px 8px 0 var(--ink);
+  --f-display:'Archivo Black','ZCOOL QingKe HuangYou','Noto Sans SC',sans-serif;
+  --f-body:'Space Grotesk','Noto Sans SC',sans-serif;
+  --f-mono:'JetBrains Mono','Noto Sans SC',monospace;
+  --t:160ms cubic-bezier(.22,.9,.34,1.2);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:auto;}
+body{
+  font-family:var(--f-body);
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.55;
+  overflow-x:hidden;
+  font-size:17px;
+}
+/* paper grain + faint dot grid, layered ambient background */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(var(--ink) 1px, transparent 1px);
+  background-size:26px 26px;opacity:.06;
+}
+.grain{
+  position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.05;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+::selection{background:var(--yellow);color:var(--ink);}
+
+h1,h2,h3{font-family:var(--f-display);font-weight:400;line-height:1.08;letter-spacing:.01em;text-wrap:balance;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px;position:relative;z-index:1;}
+main{position:relative;z-index:1;}
+
+/* ============ REUSABLE BLOCKS ============ */
+.card{background:var(--white);border:var(--bd);box-shadow:var(--sh);}
+.tag{
+  display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-weight:700;
+  font-size:.78rem;letter-spacing:.04em;border:2.5px solid var(--ink);padding:4px 12px;
+  border-radius:999px;background:var(--white);text-transform:uppercase;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-weight:700;
+  font-size:.95rem;border:var(--bd);box-shadow:var(--sh);padding:12px 22px;background:var(--yellow);
+  color:var(--ink);cursor:pointer;text-decoration:none;transition:transform var(--t),box-shadow var(--t),background var(--t);
+  user-select:none;
+}
+.btn:hover{transform:translate(-2px,-2px) rotate(-1deg);box-shadow:var(--sh-lg);}
+.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink);}
+.btn.blue{background:var(--blue);color:#fff;}
+.btn.pink{background:var(--pink);color:#fff;}
+.btn.ghost{background:var(--white);}
+.hi{ /* inline highlight slab behind a word */
+  display:inline-block;padding:.04em .18em .1em;border:var(--bd);box-shadow:var(--sh);
+  transform:rotate(-1.4deg);background:var(--yellow);
+}
+.sticker{
+  position:absolute;font-family:var(--f-mono);font-weight:700;font-size:.8rem;letter-spacing:.05em;
+  border:2.5px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:8px 14px;background:var(--pink);
+  color:#fff;transform:rotate(6deg);z-index:3;text-transform:uppercase;white-space:nowrap;
+}
+
+/* ============ TOP TICKER ============ */
+.ticker{background:var(--ink);color:var(--yellow);overflow:hidden;border-bottom:var(--bd);position:relative;z-index:5;}
+.ticker-track{display:flex;width:max-content;animation:tick 26s linear infinite;font-family:var(--f-mono);font-weight:700;font-size:.85rem;letter-spacing:.12em;padding:9px 0;text-transform:uppercase;}
+.ticker-track span{padding:0 22px;white-space:nowrap;}
+@keyframes tick{to{transform:translateX(-50%);}}
+
+/* ============ NAV ============ */
+nav{
+  position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:var(--bd);
+}
+.nav-in{display:flex;align-items:center;gap:26px;padding:14px 28px;max-width:1180px;margin:0 auto;}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.logo-block{
+  width:40px;height:40px;background:var(--blue);border:var(--bd);box-shadow:3px 3px 0 var(--ink);
+  display:grid;place-items:center;color:#fff;font-family:var(--f-display);font-size:1.25rem;
+  transform:rotate(-4deg);transition:transform var(--t);
+}
+.logo:hover .logo-block{transform:rotate(4deg) scale(1.06);}
+.logo-name{font-family:var(--f-display);font-size:1.3rem;letter-spacing:.02em;}
+.nav-links{display:flex;gap:6px;margin-left:auto;}
+.nav-links a{
+  font-family:var(--f-mono);font-weight:700;font-size:.85rem;color:var(--ink);text-decoration:none;
+  padding:8px 14px;border:2.5px solid transparent;transition:all var(--t);
+}
+.nav-links a:hover{border-color:var(--ink);background:var(--yellow);box-shadow:3px 3px 0 var(--ink);transform:translate(-1px,-1px);}
+.nav-cta{flex-shrink:0;}
+@media(max-width:860px){.nav-links{display:none;}}
+
+/* ============ HERO / CONSOLE ============ */
+.hero{padding:76px 0 64px;position:relative;}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;align-items:start;}
+.hero-copy{padding-top:14px;}
+.hero-eyebrow{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;}
+.hero h1{font-size:clamp(2.7rem,5.6vw,4.6rem);margin-bottom:24px;}
+.hero h1 .hi{font-size:.92em;}
+.hero-sub{font-size:1.12rem;max-width:30em;margin-bottom:32px;font-weight:500;}
+.hero-sub b{background:var(--green);color:#fff;padding:1px 7px;border:2px solid var(--ink);font-weight:700;}
+.hero-ctas{display:flex;gap:16px;flex-wrap:wrap;}
+.hero-meta{margin-top:34px;font-family:var(--f-mono);font-size:.82rem;letter-spacing:.03em;display:flex;gap:22px;flex-wrap:wrap;opacity:.85;}
+.hero-meta b{display:block;font-size:1.5rem;font-family:var(--f-display);}
+@media(max-width:960px){.hero .wrap{grid-template-columns:1fr;gap:44px;}}
+
+/* console */
+.console{background:var(--white);border:var(--bd4);box-shadow:var(--sh-lg);transform:rotate(.6deg);position:relative;}
+.console-head{
+  display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--paper);
+  padding:11px 16px;font-family:var(--f-mono);font-weight:700;font-size:.85rem;letter-spacing:.06em;
+  border-bottom:var(--bd);
+}
+.dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);}
+.console-body{padding:18px;}
+.io-row{display:flex;gap:10px;margin-bottom:8px;}
+.io-row input{
+  flex:1;font-family:var(--f-mono);font-size:.92rem;padding:12px 14px;border:var(--bd);
+  background:var(--paper);color:var(--ink);outline:none;transition:box-shadow var(--t),transform var(--t);
+}
+.io-row input:focus{box-shadow:4px 4px 0 var(--blue);transform:translate(-1px,-1px);}
+.io-row .btn{padding:0 18px;font-size:.88rem;}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+.bin{border:var(--bd);background:var(--paper);display:flex;flex-direction:column;min-height:132px;transition:transform var(--t),box-shadow var(--t);}
+.bin:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink);}
+.bin-h{
+  display:flex;align-items:center;justify-content:space-between;padding:7px 11px;border-bottom:var(--bd);
+  font-family:var(--f-mono);font-weight:700;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;
+}
+.bin-h .cnt{border:2px solid var(--ink);padding:0 8px;border-radius:999px;background:var(--white);}
+.bin.w .bin-h{background:var(--yellow);}
+.bin.e .bin-h{background:var(--pink);color:#fff;}
+.bin.s .bin-h{background:var(--blue);color:#fff;}
+.bin.p .bin-h{background:var(--green);color:#fff;}
+.bin-list{list-style:none;padding:8px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;max-height:150px;flex:1;}
+.bin-list li{
+  font-family:var(--f-mono);font-size:.74rem;line-height:1.4;background:var(--white);border:2px solid var(--ink);
+  padding:6px 9px;position:relative;word-break:break-all;
+}
+.bin-list li .imp{color:var(--pink);font-weight:700;}
+.bin-list li.pop{animation:pop .5s cubic-bezier(.22,1.4,.36,1);}
+.bin-list li.hit{background:var(--yellow);box-shadow:3px 3px 0 var(--ink);animation:pulse .8s ease 2;}
+.bin-list .empty{border-style:dashed;background:transparent;color:rgba(20,21,20,.45);text-align:center;}
+@keyframes pop{0%{transform:scale(.6) rotate(-3deg);opacity:0;}70%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
+@keyframes pulse{0%,100%{transform:rotate(0);}30%{transform:rotate(-1.2deg) translate(-1px,-1px);}60%{transform:rotate(1.2deg);}}
+.console-log{
+  margin-top:14px;background:var(--ink);color:var(--green);font-family:var(--f-mono);font-size:.76rem;
+  padding:11px 13px;border:var(--bd);height:64px;overflow-y:auto;letter-spacing:.02em;
+}
+.console-log div{margin-bottom:3px;}
+.console-log .dim{color:#7ba08a;}
+
+/* chat bubbles */
+.chat{display:flex;flex-direction:column;gap:11px;height:236px;overflow-y:auto;padding:6px 4px;margin-bottom:13px;}
+.bubble{max-width:84%;padding:9px 13px;border:2.5px solid var(--ink);font-family:var(--f-body);font-size:.9rem;line-height:1.5;box-shadow:3px 3px 0 var(--ink);word-break:break-word;white-space:pre-wrap;text-wrap:pretty;}
+.bubble.user{align-self:flex-end;background:var(--yellow);transform:rotate(.4deg);}
+.bubble.bot{align-self:flex-start;background:var(--white);transform:rotate(-.4deg);}
+.bubble.sys{align-self:center;background:var(--paper);border-style:dashed;box-shadow:none;font-family:var(--f-mono);font-size:.74rem;opacity:.85;transform:none;}
+.bubble.typing{color:rgba(20,21,20,.55);animation:tpulse 1s ease-in-out infinite;}
+@keyframes tpulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ============ SECTION SHELL ============ */
+section{padding:84px 0;position:relative;}
+.sec-kicker{font-family:var(--f-mono);font-weight:700;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.sec-kicker::before{content:"";width:34px;height:12px;background:var(--ink);display:inline-block;}
+.sec-title{font-size:clamp(2.1rem,4.4vw,3.4rem);margin-bottom:16px;}
+.sec-sub{font-size:1.08rem;max-width:38em;font-weight:500;margin-bottom:52px;}
+
+/* ============ LAYERS BENTO ============ */
+.layers{background:var(--paper);border-top:var(--bd);border-bottom:var(--bd);}
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:26px;}
+.layer{
+  border:var(--bd4);box-shadow:var(--sh);padding:28px;position:relative;
+  transition:transform var(--t),box-shadow var(--t);
+}
+.layer:hover{transform:translate(-4px,-4px) rotate(var(--rot,0deg));box-shadow:var(--sh-lg);}
+.layer .num{font-family:var(--f-display);font-size:3.4rem;line-height:1;opacity:.28;}
+.layer h3{font-size:1.7rem;margin:12px 0 4px;}
+.layer .en{font-family:var(--f-mono);font-weight:700;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;opacity:.7;display:block;margin-bottom:16px;}
+.layer p{font-size:.98rem;font-weight:500;max-width:26em;}
+.layer .chip{
+  display:inline-block;margin-top:18px;font-family:var(--f-mono);font-size:.78rem;font-weight:700;
+  border:2.5px solid var(--ink);background:var(--white);padding:5px 12px;box-shadow:3px 3px 0 var(--ink);
+}
+.layer.l-w{grid-column:span 5;background:var(--yellow);--rot:-1.2deg;transform:rotate(-1deg);}
+.layer.l-e{grid-column:span 7;background:var(--pink);color:#fff;--rot:.8deg;transform:rotate(.5deg);}
+.layer.l-s{grid-column:span 7;background:var(--blue);color:#fff;--rot:-.6deg;transform:rotate(-.4deg);}
+.layer.l-p{grid-column:span 5;background:var(--green);color:#fff;--rot:1.2deg;transform:rotate(.8deg);}
+.layer .chip{color:var(--ink);}
+@media(max-width:820px){.layer{grid-column:span 12 !important;transform:none !important;}}
+
+/* ============ LIFECYCLE ============ */
+.life{background:var(--blue);color:#fff;border-bottom:var(--bd);}
+.life .sec-kicker::before{background:var(--yellow);}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:0;align-items:stretch;margin-top:10px;}
+.step{
+  background:var(--white);color:var(--ink);border:var(--bd4);box-shadow:var(--sh);padding:24px 20px;
+  position:relative;transition:transform var(--t),box-shadow var(--t);
+}
+.step:hover{transform:translate(-3px,-3px) rotate(-1deg);box-shadow:var(--sh-lg);z-index:2;}
+.step:not(:last-child){margin-right:38px;}
+.step:not(:last-child)::after{
+  content:"→";position:absolute;right:-34px;top:50%;transform:translateY(-50%);
+  font-family:var(--f-display);font-size:2rem;color:var(--yellow);text-shadow:3px 3px 0 var(--ink);z-index:1;
+}
+.step .snum{font-family:var(--f-mono);font-weight:700;font-size:.78rem;letter-spacing:.14em;display:inline-block;background:var(--yellow);border:2.5px solid var(--ink);padding:3px 10px;margin-bottom:14px;}
+.step h3{font-size:1.35rem;margin-bottom:8px;}
+.step p{font-size:.9rem;font-weight:500;}
+@media(max-width:920px){
+  .flow{grid-template-columns:1fr;gap:34px;}
+  .step:not(:last-child){margin-right:0;}
+  .step:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-42px;transform:translateX(-50%);}
+}
+
+/* ============ ROADMAP ============ */
+.road{background:var(--paper);}
+.road-list{display:flex;flex-direction:column;gap:18px;max-width:820px;}
+.mstone{
+  display:flex;align-items:center;gap:20px;background:var(--white);border:var(--bd);box-shadow:var(--sh);
+  padding:18px 22px;transition:transform var(--t),box-shadow var(--t);
+}
+.mstone:hover{transform:translate(-3px,-3px) rotate(-.5deg);box-shadow:var(--sh-lg);}
+.mstone .mid{font-family:var(--f-display);font-size:1.5rem;min-width:64px;}
+.mstone .mdesc{flex:1;}
+.mstone .mdesc b{display:block;font-size:1.06rem;}
+.mstone .mdesc span{font-family:var(--f-mono);font-size:.78rem;opacity:.75;}
+.mstone .status{font-family:var(--f-mono);font-weight:700;font-size:.78rem;letter-spacing:.06em;border:2.5px solid var(--ink);padding:5px 13px;white-space:nowrap;}
+.mstone.done .status{background:var(--green);color:#fff;}
+.mstone.done .mid{color:var(--green);}
+.mstone.todo .status{background:var(--white);}
+.mstone.todo{opacity:.92;}
+
+/* ============ CODE ============ */
+.code-sec{background:var(--yellow);border-top:var(--bd);}
+.code-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:52px;align-items:center;}
+.code-card{background:var(--ink);color:var(--paper);border:var(--bd4);box-shadow:var(--sh-lg);transform:rotate(-.6deg);}
+.code-head{display:flex;gap:8px;align-items:center;padding:12px 16px;border-bottom:3px solid var(--paper);}
+.code-head .dot{border-color:var(--paper);}
+.code-head span{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.08em;margin-left:8px;opacity:.7;}
+pre{padding:22px;font-family:var(--f-mono);font-size:.86rem;line-height:1.7;overflow-x:auto;}
+.c-k{color:var(--pink);} .c-s{color:var(--green);} .c-f{color:var(--yellow);} .c-c{color:#8a8f87;} .c-n{color:#6ea8ff;}
+@media(max-width:920px){.code-grid{grid-template-columns:1fr;gap:40px;}}
+
+/* ============ FOOTER ============ */
+footer{background:var(--ink);color:var(--paper);padding:70px 0 44px;border-top:var(--bd4);}
+.foot-word{
+  font-family:var(--f-display);font-size:clamp(3.4rem,11vw,8.5rem);line-height:.95;letter-spacing:.02em;
+  color:transparent;-webkit-text-stroke:2.5px var(--paper);margin-bottom:40px;user-select:none;
+}
+.foot-word em{font-style:normal;color:var(--yellow);-webkit-text-stroke:0;}
+@supports not (-webkit-text-stroke:1px #000){.foot-word{color:var(--yellow);}}
+.foot-row{display:flex;gap:24px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-top:2px solid rgba(250,245,234,.25);padding-top:26px;font-family:var(--f-mono);font-size:.8rem;letter-spacing:.05em;}
+.foot-tags{display:flex;gap:10px;flex-wrap:wrap;}
+.foot-tags .tag{background:var(--ink);color:var(--paper);border-color:var(--paper);}
+.foot-tags .tag:nth-child(1){color:var(--yellow);} .foot-tags .tag:nth-child(2){color:var(--pink);}
+.foot-tags .tag:nth-child(3){color:var(--blue);} .foot-tags .tag:nth-child(4){color:var(--green);}
+
+/* ============ REVEAL ============ */
+.rev{opacity:0;transform:translateY(34px);}
+.rev.in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s cubic-bezier(.22,.9,.3,1.1);}
+@media (prefers-reduced-motion: reduce){
+  .ticker-track{animation:none;}
+  .rev{opacity:1;transform:none;}
+  *{transition-duration:1ms !important;animation-duration:1ms !important;}
+}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<!-- top ticker -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="ticker"></div>
+</div>
+
+<nav>
+  <div class="nav-in">
+    <a class="logo" href="#top">
+      <span class="logo-block">M</span>
+      <span class="logo-name">MEMORIA</span>
+    </a>
+    <div class="nav-links">
+      <a href="#layers">记忆四层</a>
+      <a href="#life">记忆一生</a>
+      <a href="#road">路线图</a>
+      <a href="#code">代码</a>
+    </div>
+    <a class="btn nav-cta" href="#top" data-scroll="console">聊一聊 ↓</a>
+  </div>
+</nav>
+
+<main id="top">
+
+  <!-- ======== HERO + CONSOLE ======== -->
+  <header class="hero">
+    <div class="sticker" style="top:6%;right:3%;background:var(--green);transform:rotate(-7deg);">短期 + 长期 ✦</div>
+    <div class="wrap">
+      <div class="hero-copy rev">
+        <div class="hero-eyebrow">
+          <span class="tag">Agent Memory</span>
+          <span class="tag" style="background:var(--yellow);">Python 内置模块</span>
+        </div>
+        <h1>给你的 Agent<br>一颗<span class="hi">会记住</span>的大脑</h1>
+        <p class="hero-sub">
+          和它对话，它会<b>记住</b>你——工作 / 情景 / 语义 / 程序四层记忆，
+          跨会话也不忘，越聊越懂你。记住、巩固、召回、遗忘，像人一样。
+        </p>
+        <div class="hero-ctas">
+          <a class="btn" href="#console" data-scroll="console">▶ 和它聊一聊</a>
+          <a class="btn ghost" href="#layers" data-scroll="layers">看看四层结构</a>
+        </div>
+        <div class="hero-meta">
+          <span><b>4</b>记忆层级</span>
+          <span><b>2</b>路混合召回</span>
+          <span><b>&lt;200ms</b>检索 P95 目标</span>
+        </div>
+      </div>
+
+      <div class="console" id="console">
+        <div class="console-head">
+          <span class="dot" style="background:var(--pink);"></span>
+          <span class="dot" style="background:var(--yellow);"></span>
+          <span class="dot" style="background:var(--green);"></span>
+          memoria · 和它对话
+          <span id="modeBadge" style="margin-left:auto;border:2px solid var(--paper);padding:1px 12px;border-radius:999px;font-size:.72rem;letter-spacing:.05em;">检测中…</span>
+        </div>
+        <div class="console-body">
+          <div class="chat" id="chat"></div>
+          <div class="io-row">
+            <input id="chatIn" type="text" placeholder="和 Memoria 聊聊，比如：我喜欢靠窗的座位" aria-label="对话输入">
+            <button class="btn" id="sendBtn" type="button">发送</button>
+          </div>
+          <div class="bins">
+            <div class="bin w"><div class="bin-h">工作记忆 <span class="cnt" id="c-w">0</span></div><ul class="bin-list" id="b-w"></ul></div>
+            <div class="bin e"><div class="bin-h">情景记忆 <span class="cnt" id="c-e">0</span></div><ul class="bin-list" id="b-e"></ul></div>
+            <div class="bin s"><div class="bin-h">语义记忆 <span class="cnt" id="c-s">0</span></div><ul class="bin-list" id="b-s"></ul></div>
+            <div class="bin p"><div class="bin-h">程序记忆 <span class="cnt" id="c-p">0</span></div><ul class="bin-list" id="b-p"></ul></div>
+          </div>
+          <div class="console-log" id="log"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======== LAYERS ======== -->
+  <section class="layers" id="layers">
+    <div class="wrap">
+      <div class="rev">
+        <div class="sec-kicker">01 · 数据模型</div>
+        <h2 class="sec-title">四层记忆，<span class="hi" style="background:var(--pink);color:#fff;">各司其职</span></h2>
+        <p class="sec-sub">借鉴认知科学：有的记忆只活一个会话，有的要陪用户一辈子。每一层有不同的存储、不同的衰减速度。</p>
+      </div>
+      <div class="bento">
+        <div class="layer l-w rev"><span class="num">01</span><h3>工作记忆</h3><span class="en">Working Memory</span>
+          <p>当前会话的活跃上下文。滑动窗口 + token 预算，会话结束即释放——短期的"脑子"。</p>
+          <span class="chip">例：最近 5 轮对话</span></div>
+        <div class="layer l-e rev"><span class="num">02</span><h3>情景记忆</h3><span class="en">Episodic Memory</span>
+          <p>"何时何地发生了什么"。每条带时间戳与重要性，越常被召回越牢固，久了会衰减。</p>
+          <span class="chip">例：8/1 · 重构了登录模块 · importance 0.8</span></div>
+        <div class="layer l-s rev"><span class="num">03</span><h3>语义记忆</h3><span class="en">Semantic Memory</span>
+          <p>从无数次对话里提炼出的稳定事实与偏好，高度持久、可溯源到原始情景。</p>
+          <span class="chip">例：用户偏好深色主题 · confidence 0.9</span></div>
+        <div class="layer l-p rev"><span class="num">04</span><h3>程序记忆</h3><span class="en">Procedural Memory</span>
+          <p>"如何做某事"的技能与流程。成功一次就强化，失败就降权——越用越熟练。</p>
+          <span class="chip">例：部署前先跑测试 → 构建 → 灰度</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== LIFECYCLE ======== -->
+  <section class="life" id="life">
+    <div class="wrap">
+      <div class="rev">
+        <div class="sec-kicker">02 · 生命周期</div>
+        <h2 class="sec-title">一条记忆的<span class="hi">一生</span></h2>
+        <p class="sec-sub" style="color:#fff;">记忆不是存了就完事——它会被巩固、被反复召回、也会因不重要而被遗忘。</p>
+      </div>
+      <div class="flow">
+        <div class="step rev"><span class="snum">STEP 1</span><h3>写入</h3><p>对话进入工作记忆，重要的事件被打上重要性分数，落到情景层。</p></div>
+        <div class="step rev"><span class="snum">STEP 2</span><h3>巩固</h3><p>后台把情景里的稳定事实蒸馏成语义记忆，把重复的流程固化成程序记忆。</p></div>
+        <div class="step rev"><span class="snum">STEP 3</span><h3>检索</h3><p>向量语义召回 + 结构化过滤，RRF 融合打分，把最相关的记忆注入当前上下文。</p></div>
+        <div class="step rev"><span class="snum">STEP 4</span><h3>遗忘</h3><p>强度 = 重要性 × 时近性 × 访问频率。低强度记忆被淘汰，把容量留给要紧的事。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== ROADMAP ======== -->
+  <section class="road" id="road">
+    <div class="wrap">
+      <div class="rev">
+        <div class="sec-kicker">03 · 进度</div>
+        <h2 class="sec-title">路线图 · <span class="hi" style="background:var(--green);color:#fff;">真·状态</span></h2>
+        <p class="sec-sub">不是 PPT。每个里程碑都对应可运行的代码与测试。</p>
+      </div>
+      <div class="road-list">
+        <div class="mstone done rev"><span class="mid">M0</span><div class="mdesc"><b>项目骨架</b><span>config · embedder 抽象 · DB 模型 · Alembic 迁移 · 测试基座</span></div><span class="status">✓ 已完成</span></div>
+        <div class="mstone done rev"><span class="mid">M1</span><div class="mdesc"><b>短期 + 情景记忆</b><span>工作记忆滑动窗口 · 情景存取 · 向量检索 · namespace 隔离</span></div><span class="status">✓ 已完成</span></div>
+        <div class="mstone done rev"><span class="mid">M2</span><div class="mdesc"><b>语义 + 程序 + 混合检索</b><span>跨层召回 · RRF 融合 · 重要性×时近×频率打分 · build_context</span></div><span class="status">✓ 已完成</span></div>
+        <div class="mstone done rev"><span class="mid">M3</span><div class="mdesc"><b>巩固 + 遗忘</b><span>情景→语义蒸馏 · 工作→情景摘要 · 强度衰减与淘汰</span></div><span class="status">✓ 已完成</span></div>
+        <div class="mstone done rev"><span class="mid">M4</span><div class="mdesc"><b>治理 + 评估</b><span>导出/删除（被遗忘权）· 可观测指标 · 召回质量评估集</span></div><span class="status">✓ 已完成</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== CODE ======== -->
+  <section class="code-sec" id="code">
+    <div class="wrap code-grid">
+      <div class="rev">
+        <div class="sec-kicker" style="color:var(--ink);">04 · API</div>
+        <h2 class="sec-title">三行代码，<br>开始记忆</h2>
+        <p class="sec-sub" style="margin-bottom:30px;">真实 API，来自已完成的 M0–M4。换个 embedder 只需改一个配置项。</p>
+        <a class="btn" href="#console" data-scroll="console">回到控制台玩玩 ↑</a>
+      </div>
+      <div class="code-card rev">
+        <div class="code-head">
+          <span class="dot" style="background:var(--pink);"></span>
+          <span class="dot" style="background:var(--yellow);"></span>
+          <span class="dot" style="background:var(--green);"></span>
+          <span>quickstart.py</span>
+        </div>
+<pre><code><span class="c-k">from</span> memoria <span class="c-k">import</span> Config, Memory
+
+mem = <span class="c-f">Memory</span>(<span class="c-f">Config</span>(namespace=<span class="c-s">"user:123"</span>))
+mem.<span class="c-f">init_db</span>()
+
+<span class="c-c"># 短期：滑动窗口工作记忆</span>
+mem.working.<span class="c-f">append</span>(<span class="c-s">"user"</span>, <span class="c-s">"我喜欢深色主题"</span>)
+
+<span class="c-c"># 长期：情景记忆 + 向量检索</span>
+mem.<span class="c-f">remember_event</span>(<span class="c-s">"用户说喜欢深色主题"</span>, importance=<span class="c-n">0.8</span>)
+hits = mem.<span class="c-f">recall</span>(<span class="c-s">"用户喜欢什么主题?"</span>)
+
+<span class="c-f">print</span>(hits[<span class="c-n">0</span>].content, hits[<span class="c-n">0</span>].score)</code></pre>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-word rev">MEM<em>O</em>RIA</div>
+    <div class="foot-row">
+      <span>© 2026 MEMORIA · 记住 · 巩固 · 召回 · 遗忘</span>
+      <div class="foot-tags">
+        <span class="tag">Working</span><span class="tag">Episodic</span>
+        <span class="tag">Semantic</span><span class="tag">Procedural</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============ ticker ============ */
+(function(){
+  var items=["MEMORIA","短期记忆","长期记忆","WORKING","EPISODIC","SEMANTIC","PROCEDURAL","记住 · 巩固 · 召回 · 遗忘","向量 + 结构化混合"];
+  var half=items.map(function(t){return "<span>★ "+t+"</span>";}).join("");
+  document.getElementById("ticker").innerHTML=half+half; /* duplicated for seamless loop */
+})();
+
+/* ============ smooth scroll (window.scrollTo, not scrollIntoView) ============ */
+document.querySelectorAll("[data-scroll],[href^='#']").forEach(function(a){
+  a.addEventListener("click",function(e){
+    var id=a.getAttribute("data-scroll")||(a.getAttribute("href")||"").replace("#","");
+    if(!id) return;
+    var el=document.getElementById(id); if(!el) return;
+    e.preventDefault();
+    var top=el.getBoundingClientRect().top+window.pageYOffset-84;
+    window.scrollTo({top:top,behavior:"smooth"});
+  });
+});
+
+/* ============ scroll reveal ============ */
+(function(){
+  if(!("IntersectionObserver" in window)){document.querySelectorAll(".rev").forEach(function(el){el.classList.add("in");});return;}
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(en){ if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);} });
+  },{threshold:.12});
+  document.querySelectorAll(".rev").forEach(function(el){io.observe(el);});
+})();
+
+/* ============ memory chat (live backend with demo fallback) ============ */
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var chat=$("chat"), log=$("log"), badge=$("modeBadge");
+  var mode="demo";
+  /* demo-mode local memory state (offline simulation) */
+  var state={working:[],episodic:[],semantic:[],procedural:[]};
+  var MAXW=4, uid=0;
+
+  function say(html,dim){var d=document.createElement("div");if(dim)d.className="dim";d.innerHTML=html;log.appendChild(d);log.scrollTop=log.scrollHeight;}
+  function esc(t){var s=document.createElement("span");s.textContent=t;return s.innerHTML;}
+  function addBubble(role,text,cls){var b=document.createElement("div");b.className="bubble "+role+(cls?" "+cls:"");b.innerHTML=esc(text);chat.appendChild(b);chat.scrollTop=chat.scrollHeight;return b;}
+  function li(text,cls){var el=document.createElement("li");el.innerHTML=text;if(cls)el.className=cls;return el;}
+  function renderDump(d){
+    function fill(id,countId,rows,mk){var ul=$(id);ul.innerHTML="";if(!rows.length){ul.appendChild(li("· 空 ·","empty"));}else rows.forEach(function(x){ul.appendChild(mk(x));});$(countId).textContent=rows.length;}
+    fill("b-w","c-w",d.working,function(m){return li(m.role+": "+esc(m.content));});
+    fill("b-e","c-e",d.episodic,function(e){var el=li(esc(e.content)+" <span class='imp'>imp "+e.importance+"</span>");el.dataset.id=e.id;return el;});
+    fill("b-s","c-s",d.semantic,function(f){var el=li(esc(f.subject+": "+f.fact)+" <span class='imp'>conf "+f.confidence+"</span>");el.dataset.id=f.id;return el;});
+    fill("b-p","c-p",d.procedural,function(p){var el=li("<b>"+esc(p.trigger)+"</b><br>"+esc((p.steps||[]).join(" → ")));el.dataset.id=p.id;return el;});
+  }
+  /* demo-mode memory simulation (drives the bins when no backend) */
+  function rememberLocal(text){
+    state.working.push({role:"user",content:text});
+    if(state.working.length>MAXW) state.working.shift();
+    var imp=+Math.min(0.99,0.5+text.length/60+(/[!！重要紧急部署上线]/.test(text)?0.15:0)).toFixed(2);
+    state.episodic.unshift({id:"ep-"+(++uid),content:text,importance:imp});
+    if(/喜欢|偏好|爱|习惯|总是|讨厌|想要|不喜欢/.test(text)) state.semantic.unshift({id:"sem-"+uid,subject:"用户",fact:text,confidence:0.85});
+    if(/先|然后|再|接着|步骤|流程/.test(text)){var steps=text.split(/先|然后|接着|再|，|,|。/).map(function(s){return s.trim();}).filter(Boolean);state.procedural.unshift({id:"proc-"+uid,trigger:"自定义流程",steps:steps.length?steps:[text]});}
+    renderDump(state);
+  }
+
+  /* ---- live mode (real backend) ---- */
+  function jfetch(path,opts){return fetch(path,opts).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});}
+  function refresh(){return jfetch("/api/dump").then(renderDump);}
+  function sendLive(text){
+    addBubble("user",text);
+    var typing=addBubble("bot","正在回忆与思考 …","typing");
+    return jfetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text})}).then(function(res){
+      typing.remove();
+      addBubble("bot",res.reply||"（无回复）");
+      say("> chat · 召回 "+(res.recalled||0)+" 条记忆"+(res.tools_called&&res.tools_called.length?" · 调用工具 "+res.tools_called.join(", "):"")+(res.distilled_facts?" · 蒸馏事实 "+res.distilled_facts+" 条":""));
+      return refresh();
+    });
+  }
+  /* ---- demo-mode chat (no backend) ---- */
+  function sendDemo(text){
+    addBubble("user",text);
+    rememberLocal(text);
+    var typing=addBubble("bot","…","typing");
+    setTimeout(function(){typing.remove();addBubble("bot","【演示模式】我记下了：「"+text+"」。想让我真正听懂你、回答你，请双击 start.bat 启动真实后端（千问向量 + DeepSeek）。");},350);
+  }
+
+  /* ---- dispatch (mode-aware) ---- */
+  function doSend(){var text=$("chatIn").value.trim();if(!text)return;$("chatIn").value="";
+    if(mode==="live")sendLive(text).catch(function(){addBubble("sys","后端请求失败，请确认服务已启动");});
+    else sendDemo(text);}
+  $("sendBtn").addEventListener("click",doSend);
+  $("chatIn").addEventListener("keydown",function(e){if(e.key==="Enter")doSend();});
+
+  /* ---- boot: probe backend, choose live vs demo ---- */
+  jfetch("/api/health").then(function(h){
+    mode="live";badge.textContent="● 真实后端";badge.style.color="var(--green)";
+    say("# 已连接 Memoria 后端 · embedder "+h.embedder+" · llm "+(h.llm||"none"));
+    addBubble("bot","你好，我是 Memoria。我会记住你说过的话，还能查地图、推荐周边、规划路线、看天气。直接告诉我你想做什么吧。（千问向量 + DeepSeek + 高德地图）");
+    jfetch("/api/tools").then(function(t){if(t&&t.connected)say("# 已连接高德地图 MCP · "+t.tools.length+" 个工具可用");}).catch(function(){});
+    return refresh();
+  }).catch(function(){
+    mode="demo";badge.textContent="○ 演示模式";badge.style.color="var(--yellow)";
+    say('<span class="dim"># 演示模式（本地模拟）· 双击 start.bat 启动真实后端</span>',true);
+    addBubble("bot","你好，我是 Memoria。现在是演示模式（本地模拟）。双击 start.bat 启动真实后端后，我能真正听懂你、记住你。");
+  });
+})();
+</script>
+</body>
+</html>

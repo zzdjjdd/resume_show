@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZZD · LLM / Agent 方向工程师</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Background layers -->
+<canvas id="starfield"></canvas>
+<div class="grid-overlay" aria-hidden="true"></div>
+<div class="scanlines" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- Boot / loader -->
+<div id="boot" class="boot">
+  <div class="boot-inner">
+    <div class="boot-ring"></div>
+    <pre class="boot-log" id="bootLog"></pre>
+  </div>
+</div>
+
+<!-- Nav -->
+<header class="nav" id="nav">
+  <a class="brand" href="#home">
+    <span class="brand-mark">◆</span>
+    <span class="brand-text">Z<span class="accent">ZD</span></span>
+  </a>
+  <nav class="nav-links" id="navLinks">
+    <a href="#home" class="active"><span class="idx">01</span>首页</a>
+    <a href="#about"><span class="idx">02</span>关于我</a>
+    <a href="#projects"><span class="idx">03</span>项目</a>
+    <a href="#kaggle"><span class="idx">04</span>竞赛战绩</a>
+    <a href="#academic"><span class="idx">05</span>学术与荣誉</a>
+    <a href="#stack"><span class="idx">06</span>技术栈</a>
+  </nav>
+  <button class="nav-toggle" id="navToggle" aria-label="menu"><span></span><span></span><span></span></button>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section id="home" class="hero">
+    <div class="hero-hud">
+      <div class="hud-corner tl"></div><div class="hud-corner tr"></div>
+      <div class="hud-corner bl"></div><div class="hud-corner br"></div>
+    </div>
+    <div class="hero-content reveal">
+      <div class="hero-tag">
+        <span class="dot"></span> SYSTEM ONLINE · LLM / AGENT UNIT
+      </div>
+      <h1 class="hero-name" data-text="ZZD">ZZD</h1>
+      <p class="hero-role" id="typeRole"></p>
+      <p class="hero-desc">
+        深耕大模型（LLM）技术方向，具备完整的 Agent 智能体、RAG 检索增强、大模型微调
+        与工程落地实战经验。擅长通过监督微调、数据增强与 BadCase 迭代，优化大模型在
+        工具调用、长对话与领域知识库问答上的效果。
+      </p>
+      <div class="hero-badges">
+        <span class="badge">Kaggle 国际竞赛 3 银</span>
+        <span class="badge">SCI 二区论文</span>
+        <span class="badge">医疗领域 Multi-Agent 系统</span>
+      </div>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">查看开源项目 <span>→</span></a>
+        <a href="#kaggle" class="btn btn-ghost">竞赛战绩</a>
+      </div>
+    </div>
+    <a href="#about" class="scroll-cue" aria-label="scroll">
+      <span>SCROLL</span><span class="cue-line"></span>
+    </a>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats reveal">
+    <div class="stat"><div class="stat-num" data-count="3">0</div><div class="stat-label">Kaggle 银牌</div></div>
+    <div class="stat"><div class="stat-num" data-count="4">0</div><div class="stat-label">开源项目</div></div>
+    <div class="stat"><div class="stat-num" data-count="1">0</div><div class="stat-label">SCI 二区论文</div></div>
+    <div class="stat"><div class="stat-num" data-count="2">0</div><div class="stat-label">专业证书</div></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="section">
+    <div class="section-head reveal">
+      <span class="section-idx">02 / ABOUT</span>
+      <h2 class="section-title">关于我</h2>
+    </div>
+    <div class="about-grid">
+      <div class="panel reveal">
+        <div class="panel-scan"></div>
+        <h3 class="panel-h">LLM 应用 · Agent 智能体 · 工程落地</h3>
+        <p>
+          熟练掌握机器学习与深度学习技术，精通 <b>HuggingFace</b> 生态、
+          <b>PEFT / LoRA</b> 微调、提示工程与多智能体架构设计，熟悉 Python、Linux
+          开发环境，具备后端服务封装与部署能力。
+        </p>
+        <ul class="feature-list">
+          <li><i>▹</i> Agent 智能体与 Multi-Agent 协作架构设计</li>
+          <li><i>▹</i> RAG 检索增强与领域知识库问答</li>
+          <li><i>▹</i> PEFT / LoRA 监督微调与数据增强</li>
+          <li><i>▹</i> 大模型工具调用（Function Call）优化</li>
+          <li><i>▹</i> 提示工程与 BadCase 迭代优化闭环</li>
+          <li><i>▹</i> Python / Linux 后端服务封装与部署</li>
+        </ul>
+      </div>
+      <div class="panel panel-teach reveal">
+        <div class="panel-scan"></div>
+        <h3 class="panel-h">硕士阶段 · 医疗领域大模型 Agent 系统</h3>
+        <p>
+          主导<b>阿尔茨海默症临床辅助诊疗 Agent</b> 的全链路设计实现，积累了垂直领域
+          大模型从需求分析、数据集构建、模型训练迭代到效果评测落地的完整项目经验。
+        </p>
+        <div class="course-item">
+          <span class="course-tag">MODULE_01</span>
+          <div>
+            <b>Multi-Agent 协作架构</b>
+            <p>多角色分工与路由调度，拆解临床诊疗复杂任务。</p>
+          </div>
+        </div>
+        <div class="course-item">
+          <span class="course-tag">MODULE_02</span>
+          <div>
+            <b>记忆与渐进式上下文管理</b>
+            <p>长对话场景下的记忆组织与上下文窗口调度。</p>
+          </div>
+        </div>
+        <div class="course-item">
+          <span class="course-tag">MODULE_03</span>
+          <div>
+            <b>结构化 RAG 知识库</b>
+            <p>面向临床领域知识的结构化检索与增强生成。</p>
+          </div>
+        </div>
+        <div class="course-item">
+          <span class="course-tag">MODULE_04</span>
+          <div>
+            <b>Function Call LoRA 监督微调</b>
+            <p>针对 Prompt 方案的工具调用瓶颈，基于开源大模型微调。</p>
+          </div>
+        </div>
+        <div class="honor-strip">
+          <span>路由准确率 ↑</span>
+          <span>函数调用匹配度 ↑</span>
+          <span>端到端任务成功率 ↑</span>
+          <span>推理时延 ↓</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="section">
+    <div class="section-head reveal">
+      <span class="section-idx">03 / PROJECTS</span>
+      <h2 class="section-title">开源项目</h2>
+      <p class="section-sub">从记忆系统、检索增强到 Agent 工具调用，均为可运行的完整实现。</p>
+    </div>
+    <div class="projects-grid">
+      <article class="paper reveal">
+        <div class="panel-scan"></div>
+        <div class="paper-type">Python · 记忆系统 · 98 项测试</div>
+        <h3>Memoria · Agent 记忆模块</h3>
+        <p class="paper-en">四层认知记忆模型（工作 / 情景 / 语义 / 程序），向量库与 SQLite 混合存储，支持跨层混合检索、记忆巩固与遗忘治理；embedder 与 LLM 均可插拔替换。</p>
+        <div class="paper-role">长期记忆 · 上下文管理</div>
+        <a class="paper-link" href="https://github.com/zzdjjdd/memoria" target="_blank" rel="noopener">GitHub ↗</a>
+      </article>
+      <article class="paper reveal">
+        <div class="panel-scan"></div>
+        <div class="paper-type">FastAPI · FAISS · RAG</div>
+        <h3>Local RAG Knowledge Base</h3>
+        <p class="paper-en">本地知识库问答系统：Qwen3-Embedding-4B 向量化 + FAISS 检索 + MiniMax-M3 生成，支持多格式文档入库、引用来源标注，并自动跳过非知识类问题以节省 token。</p>
+        <div class="paper-role">RAG 检索增强 · 知识库问答</div>
+        <a class="paper-link" href="https://github.com/zzdjjdd/private-rag" target="_blank" rel="noopener">GitHub ↗</a>
+      </article>
+      <article class="paper reveal">
+        <div class="panel-scan"></div>
+        <div class="paper-type">FastAPI · MCP · Function Call</div>
+        <h3>AI 智行助手 · 出行 Agent</h3>
+        <p class="paper-en">端云协同的出行助手：行程规划 + SSE 流式对话，模型自行决定调用高德地图、12306、酒店查询等 MCP 工具；内置通用 MCP 客户端，可接入任意 MCP server。</p>
+        <div class="paper-role">Agent 智能体 · 工具调用</div>
+        <a class="paper-link" href="https://github.com/zzdjjdd/ai-travel-assistant" target="_blank" rel="noopener">GitHub ↗</a>
+      </article>
+      <article class="paper reveal">
+        <div class="panel-scan"></div>
+        <div class="paper-type">FastAPI · LangChain · 可视化</div>
+        <h3>Context Pilot · 上下文领航员</h3>
+        <p class="paper-en">上下文管理教学演示系统：KV Cache 命中与失效、窗口溢出的删除 / 摘要 / 裁剪三种策略对比，以及 RAG 检索与工具调用过程的实时可视化。</p>
+        <div class="paper-role">上下文工程 · 渐进式管理</div>
+        <a class="paper-link" href="https://github.com/zzdjjdd/context-pilot" target="_blank" rel="noopener">GitHub ↗</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- KAGGLE -->
+  <section id="kaggle" class="section">
+    <div class="section-head reveal">
+      <span class="section-idx">04 / BATTLE LOG</span>
+      <h2 class="section-title">Kaggle 国际竞赛战绩</h2>
+      <p class="section-sub">Kaggle 国际竞赛 3 枚银牌，覆盖图像分割、目标检测与细粒度分类任务。</p>
+    </div>
+    <div class="timeline" id="timeline">
+      <!-- items injected by JS -->
+    </div>
+  </section>
+
+  <!-- ACADEMIC -->
+  <section id="academic" class="section">
+    <div class="section-head reveal">
+      <span class="section-idx">05 / RESEARCH</span>
+      <h2 class="section-title">学术与荣誉</h2>
+    </div>
+    <div class="academic-grid">
+      <article class="paper reveal">
+        <div class="panel-scan"></div>
+        <div class="paper-type">SCI 二区 · 论文发表</div>
+        <h3>SCI 二区论文发表</h3>
+        <!-- 补充论文信息时，把下面两行取消注释并填入中英文标题与 DOI
+        <p class="paper-en">English title of the paper</p>
+        <a class="paper-link" href="https://doi.org/..." target="_blank" rel="noopener">DOI ↗</a>
+        -->
+        <div class="paper-role">硕士阶段研究成果</div>
+      </article>
+      <article class="paper patent reveal">
+        <div class="panel-scan"></div>
+        <div class="paper-type">证书与荣誉</div>
+        <h3>专业证书 · 校内荣誉</h3>
+        <ul class="patent-list">
+          <li><span class="pill pill-ok">证书</span> 全国大学英语六级（CET-6）</li>
+          <li><span class="pill pill-ok">证书</span> 全国计算机等级考试二级 · Python</li>
+          <li><span class="pill pill-ok">荣誉</span> 校级二等奖学金</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section id="stack" class="section">
+    <div class="section-head reveal">
+      <span class="section-idx">06 / TECH STACK</span>
+      <h2 class="section-title">技术栈</h2>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-col reveal">
+        <h4>大模型 & 微调</h4>
+        <div class="chips">
+          <span>LLM</span><span>HuggingFace</span><span>PEFT / LoRA</span>
+          <span>SFT 监督微调</span><span>数据增强</span><span>提示工程</span>
+          <span>Function Call</span><span>BadCase 迭代</span>
+        </div>
+      </div>
+      <div class="stack-col reveal">
+        <h4>Agent & 检索</h4>
+        <div class="chips">
+          <span>Agent 智能体</span><span>Multi-Agent 架构</span><span>工具调用</span>
+          <span>RAG 检索增强</span><span>向量检索</span><span>知识库问答</span>
+          <span>记忆管理</span><span>上下文管理</span>
+        </div>
+      </div>
+      <div class="stack-col reveal">
+        <h4>工程 & 基础</h4>
+        <div class="chips">
+          <span>Python</span><span>Linux</span><span>后端服务封装</span>
+          <span>模型部署</span><span>机器学习</span><span>深度学习</span>
+          <span>模型评测</span><span>Kaggle</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-line">
+    <span class="footer-brand">◆ ZZD</span>
+    <span class="footer-meta">LLM · AGENT · RAG</span>
+  </div>
+  <p class="footer-note">// 用大模型解决真实世界的难题 — powered by Vibe Coding</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

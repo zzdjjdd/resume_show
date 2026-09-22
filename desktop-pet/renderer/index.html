@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>宝贝桌面宠物</title>
+<style>
+  /* ===== 设计令牌（二次元美少女配色） ===== */
+  :root{
+    --skin:#ffe6d8; --skin-sh:#f8c9b4; --cheek:#ff90a6;
+    --hair:#6b4a34; --hair-hi:#a8815f; --hair-tie:#ff87b0;
+    --denim:#5a8fd6; --denim-sh:#3f74c0; --denim-hi:#8fbef0;
+    --shirt:#fff7f0; --stitch:#ffd27a; --ink:#5a4550;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:transparent;
+    user-select:none;-webkit-user-select:none;cursor:default;}
+
+  .stage{position:absolute;inset:0;display:grid;place-items:center;}
+  .char{width:300px;height:300px;display:block;overflow:visible;
+    transform-origin:50% 88%;
+    transition:transform .45s cubic-bezier(.34,1.56,.64,1);}
+  .char *{pointer-events:none;}
+
+  .char .shadow{transition:transform .45s ease,opacity .45s ease;transform-origin:center;}
+
+  .stage.hover .char{animation:sway 1.1s ease-in-out infinite;}
+  @keyframes sway{0%,100%{transform:rotate(-3.2deg)}50%{transform:rotate(3.2deg)}}
+
+  .stage.idle .char{animation:breathe 3.6s ease-in-out infinite;}
+  @keyframes breathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.012)}}
+
+  .stage.shy .char{transform:translate(-26px,4px) rotate(-4deg);}
+
+  .stage.pat .char{animation:patBounce .5s ease;}
+  @keyframes patBounce{0%{transform:translateY(0)}35%{transform:translateY(9px) scaleY(.96)}100%{transform:translateY(0)}}
+
+  /* 眨眼 */
+  .lid{transform-box:fill-box;transform-origin:center;transform:scaleY(0);transition:transform .08s ease;}
+  .stage.blink .lid{transform:scaleY(1);}
+
+  /* 呆毛摆动 */
+  .ahoge{transform-box:fill-box;transform-origin:50% 100%;animation:ahogeWiggle 3.2s ease-in-out infinite;}
+  @keyframes ahogeWiggle{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(9deg)}}
+
+  .cheek{opacity:.7;transition:opacity .4s ease;}
+  .stage.shy .cheek,.stage.hover .cheek{opacity:1;}
+
+  .mouth{transition:d .35s ease;}
+
+  /* 麻花双辫绕头顶摆动 */
+  .braid{transform-origin:100px 58px;}
+  .stage.hover .braid,.stage.idle .braid{animation:braidSwing 1.9s ease-in-out infinite;}
+  @keyframes braidSwing{0%,100%{transform:rotate(-3.5deg)}50%{transform:rotate(4deg)}}
+  .stage.fixhair .braid{animation:braidFix 1.4s ease;}
+  @keyframes braidFix{0%,100%{transform:rotate(0)}25%{transform:rotate(-11deg)}60%{transform:rotate(6deg)}}
+
+  .phone{opacity:0;transform:translate(6px,10px) rotate(-8deg);transform-origin:center;
+    transition:opacity .3s ease,transform .3s ease;}
+  .stage.phone-up .phone{opacity:1;transform:translate(0,0) rotate(-8deg);}
+
+  .yawn-mouth{opacity:0;transition:opacity .3s ease;}
+  .stage.yawn .yawn-mouth{opacity:1;}
+  .stage.yawn .mouth{opacity:0;}
+
+  .fx{position:absolute;inset:0;pointer-events:none;overflow:visible;}
+  .heart{position:absolute;width:24px;height:24px;will-change:transform,opacity;
+    animation:floatUp 1.1s ease-out forwards;}
+  @keyframes floatUp{
+    0%{transform:translate(-50%,-50%) scale(.2) rotate(0);opacity:0}
+    18%{opacity:1}
+    100%{transform:translate(-50%,-190%) scale(1.1) rotate(var(--r));opacity:0}}
+
+  .bubble{position:absolute;left:50%;top:2%;translate:-50% 0;
+    background:#fff;color:var(--ink);padding:5px 12px;border-radius:15px;
+    font-size:13px;white-space:nowrap;font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+    box-shadow:0 6px 18px rgba(120,80,60,.18);opacity:0;
+    transition:opacity .3s ease,translate .3s ease;pointer-events:none;}
+  .bubble::after{content:"";position:absolute;left:50%;bottom:-5px;translate:-50% 0;
+    border:6px solid transparent;border-top-color:#fff;}
+  .bubble.show{opacity:1;translate:-50% -6px;}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="bubble" id="bubble"></div>
+
+    <svg class="char" id="char" viewBox="0 0 200 200">
+      <defs>
+        <radialGradient id="iris" cx="50%" cy="30%" r="72%">
+          <stop offset="0%" stop-color="#cdf4ff"/>
+          <stop offset="42%" stop-color="#6cc4f2"/>
+          <stop offset="100%" stop-color="#3f74cf"/>
+        </radialGradient>
+        <linearGradient id="hairGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#845c45"/>
+          <stop offset="100%" stop-color="#5b3d2c"/>
+        </linearGradient>
+        <radialGradient id="blushGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ff90a6"/>
+          <stop offset="100%" stop-color="#ff90a6" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <ellipse class="shadow" cx="100" cy="190" rx="44" ry="8" fill="#000" opacity=".12"/>
+
+      <!-- 身体：牛仔背带裤 -->
+      <g id="body">
+        <ellipse cx="100" cy="120" rx="9" ry="9" fill="var(--skin-sh)"/>
+        <path d="M70 128 q30 -14 60 0 l4 34 q-34 12 -68 0 z" fill="var(--shirt)"/>
+        <path d="M66 150 q34 16 68 0 l2 30 q-36 14 -72 0 z" fill="var(--denim)"/>
+        <path d="M66 150 q34 16 68 0 l1 12 q-35 14 -70 0 z" fill="var(--denim-hi)" opacity=".45"/>
+        <path d="M84 118 l-6 44" stroke="var(--denim)" stroke-width="9" stroke-linecap="round"/>
+        <path d="M116 118 l6 44" stroke="var(--denim)" stroke-width="9" stroke-linecap="round"/>
+        <path d="M88 150 h24 v18 h-24 z" fill="var(--denim-sh)"/>
+        <path d="M88 150 h24 v18 h-24 z" fill="none" stroke="var(--stitch)" stroke-width="1.4" stroke-dasharray="3 2.5"/>
+        <circle cx="82" cy="122" r="3.4" fill="var(--stitch)"/>
+        <circle cx="118" cy="122" r="3.4" fill="var(--stitch)"/>
+        <path d="M70 132 q30 -12 60 0" fill="none" stroke="var(--stitch)" stroke-width="1.2" stroke-dasharray="3 2.5" opacity=".8"/>
+        <g class="phone">
+          <rect x="120" y="150" width="16" height="26" rx="3" fill="#2b2b33"/>
+          <rect x="122.5" y="153" width="11" height="18" rx="1.5" fill="#8fd0ff"/>
+        </g>
+        <ellipse cx="70" cy="150" rx="8" ry="9" fill="var(--skin)"/>
+        <ellipse cx="130" cy="150" rx="8" ry="9" fill="var(--skin)"/>
+      </g>
+
+      <!-- 头部 -->
+      <g id="head">
+        <!-- 后发 -->
+        <path d="M60 66 Q58 30 100 30 Q142 30 140 66 Q141 98 130 108 L70 108 Q59 98 60 66 Z" fill="url(#hairGrad)"/>
+        <!-- 脸 -->
+        <ellipse cx="100" cy="86" rx="36" ry="35" fill="var(--skin)"/>
+        <path d="M66 96 q34 24 68 0 q-6 20 -34 20 q-28 0 -34 -20 z" fill="var(--skin-sh)" opacity=".28"/>
+        <!-- 呆毛 -->
+        <path class="ahoge" d="M99 40 Q89 30 97 20 Q103 14 101 24 Q110 17 105 30 Q112 30 103 38 Z" fill="url(#hairGrad)"/>
+        <!-- 刘海 -->
+        <path d="M62 78 Q58 44 100 40 Q142 44 138 78 Q131 62 121 71 Q117 55 107 67 Q103 52 96 66 Q91 55 81 70 Q71 62 62 78 Z" fill="url(#hairGrad)"/>
+        <path d="M74 60 Q92 52 110 58" stroke="var(--hair-hi)" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".5"/>
+        <!-- 眉 -->
+        <path d="M74 73 Q84 69 93 73" stroke="#6b4a34" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".8"/>
+        <path d="M107 73 Q116 69 126 73" stroke="#6b4a34" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".8"/>
+
+        <g id="face">
+          <!-- 左眼 -->
+          <ellipse cx="84" cy="92" rx="11" ry="13" fill="#fff"/>
+          <g class="pupil" data-eye>
+            <ellipse cx="84" cy="93" rx="9" ry="11.5" fill="url(#iris)"/>
+            <ellipse cx="84" cy="96" rx="5" ry="6.5" fill="#26324e"/>
+            <ellipse cx="84" cy="100" rx="5.5" ry="2.6" fill="#bdeeff" opacity=".55"/>
+            <circle cx="79" cy="86" r="3.6" fill="#fff"/>
+            <circle cx="88" cy="97" r="2" fill="#fff" opacity=".85"/>
+          </g>
+          <path d="M72 86 Q84 77 96 87" fill="none" stroke="#3b2c3f" stroke-width="3.2" stroke-linecap="round"/>
+          <path d="M72 86 q-4 -1 -6 -4" fill="none" stroke="#3b2c3f" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M75 103 Q84 106 92 103" fill="none" stroke="#e2a08f" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>
+          <g class="lid">
+            <ellipse cx="84" cy="92" rx="12" ry="13.6" fill="var(--skin)"/>
+            <path d="M73 92 Q84 98 95 92" fill="none" stroke="#caa08a" stroke-width="2" stroke-linecap="round"/>
+          </g>
+          <!-- 右眼 -->
+          <ellipse cx="116" cy="92" rx="11" ry="13" fill="#fff"/>
+          <g class="pupil" data-eye>
+            <ellipse cx="116" cy="93" rx="9" ry="11.5" fill="url(#iris)"/>
+            <ellipse cx="116" cy="96" rx="5" ry="6.5" fill="#26324e"/>
+            <ellipse cx="116" cy="100" rx="5.5" ry="2.6" fill="#bdeeff" opacity=".55"/>
+            <circle cx="121" cy="86" r="3.6" fill="#fff"/>
+            <circle cx="112" cy="97" r="2" fill="#fff" opacity=".85"/>
+          </g>
+          <path d="M104 87 Q116 77 128 86" fill="none" stroke="#3b2c3f" stroke-width="3.2" stroke-linecap="round"/>
+          <path d="M128 86 q4 -1 6 -4" fill="none" stroke="#3b2c3f" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M108 103 Q116 106 125 103" fill="none" stroke="#e2a08f" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>
+          <g class="lid">
+            <ellipse cx="116" cy="92" rx="12" ry="13.6" fill="var(--skin)"/>
+            <path d="M105 92 Q116 98 127 92" fill="none" stroke="#caa08a" stroke-width="2" stroke-linecap="round"/>
+          </g>
+
+          <!-- 鼻 -->
+          <path d="M99 104 q1 1.6 2 0" fill="none" stroke="#e0a58f" stroke-width="1.3" stroke-linecap="round" opacity=".6"/>
+          <!-- 腮红 -->
+          <g class="cheek">
+            <ellipse cx="72" cy="103" rx="9" ry="5.5" fill="url(#blushGrad)"/>
+            <path d="M69 101 l3 3 M73 100 l3 3 M77 100 l3 3" stroke="#ff8fa0" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/>
+          </g>
+          <g class="cheek">
+            <ellipse cx="128" cy="103" rx="9" ry="5.5" fill="url(#blushGrad)"/>
+            <path d="M121 100 l3 3 M125 100 l3 3 M129 100 l3 3" stroke="#ff8fa0" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/>
+          </g>
+          <!-- 嘴 -->
+          <path class="mouth" id="mouth" d="M95 111 Q100 115 105 111" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
+          <ellipse class="yawn-mouth" cx="100" cy="113" rx="5" ry="7" fill="#d17a72"/>
+        </g>
+      </g>
+
+      <!-- 麻花双辫（前挂） -->
+      <g class="braid">
+        <g>
+          <path d="M64 100 q-12 16 -7 32 q11 -4 15 4 q-11 12 -4 26 q10 -4 14 4 q-8 9 -2 18"
+                fill="none" stroke="url(#hairGrad)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M64 100 q-12 16 -7 32 q11 -4 15 4 q-11 12 -4 26 q10 -4 14 4 q-8 9 -2 18"
+                fill="none" stroke="var(--hair-hi)" stroke-width="3.5" stroke-linecap="round" opacity=".45"/>
+          <circle cx="64" cy="100" r="4.5" fill="var(--hair-tie)"/>
+          <ellipse cx="78" cy="182" rx="6.5" ry="4.5" fill="var(--hair-tie)"/>
+        </g>
+        <g transform="translate(200,0) scale(-1,1)">
+          <path d="M64 100 q-12 16 -7 32 q11 -4 15 4 q-11 12 -4 26 q10 -4 14 4 q-8 9 -2 18"
+                fill="none" stroke="url(#hairGrad)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M64 100 q-12 16 -7 32 q11 -4 15 4 q-11 12 -4 26 q10 -4 14 4 q-8 9 -2 18"
+                fill="none" stroke="var(--hair-hi)" stroke-width="3.5" stroke-linecap="round" opacity=".45"/>
+          <circle cx="64" cy="100" r="4.5" fill="var(--hair-tie)"/>
+          <ellipse cx="78" cy="182" rx="6.5" ry="4.5" fill="var(--hair-tie)"/>
+        </g>
+      </g>
+    </svg>
+
+    <div class="fx" id="fx"></div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

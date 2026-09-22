@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="auto">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>日常聊天 · AI 智行助手</title>
+  <link rel="stylesheet" href="/static/assets/css/main.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23c8423c'/%3E%3Ctext x='50' y='66' font-size='58' text-anchor='middle' fill='white' font-family='PingFang SC,sans-serif' font-weight='600'%3E聊%3C/text%3E%3C/svg%3E" />
+  <style>
+    .chat-shell {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 70px);
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 16px 20px 20px;
+    }
+    .chat-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 8px 4px 16px;
+      border-bottom: 1px dashed var(--border-default);
+      margin-bottom: 14px;
+    }
+    .chat-toolbar .muted { font-size: 13px; }
+    .chat-stream-wrap {
+      flex: 1; overflow-y: auto;
+      padding-right: 6px;
+    }
+    .chat-input-wrap {
+      padding-top: 14px;
+      border-top: 1px solid var(--border-default);
+      margin-top: 14px;
+    }
+    .placeholder-tip {
+      text-align: center;
+      color: var(--fg-muted);
+      padding: 64px 20px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .placeholder-tip h3 {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+    .suggest-chip {
+      display: inline-block;
+      margin: 6px 4px;
+      padding: 8px 14px;
+      border: 1px solid var(--border-default);
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      background: var(--bg-elevated);
+      transition: all var(--dur-fast);
+    }
+    .suggest-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-progress" id="scroll-progress"></div>
+
+  <header class="topnav">
+    <a href="/" class="topnav__brand">
+      <span class="topnav__logo">智</span>
+      <span>AI 智行助手</span>
+    </a>
+    <nav class="topnav__links">
+      <a class="topnav__link" href="/"><span class="topnav__link--label">首页</span></a>
+      <a class="topnav__link" href="/plan"><span class="topnav__link--label">旅游模式</span></a>
+      <a class="topnav__link is-active" href="/chat"><span class="topnav__link--label">日常聊天</span></a>
+      <a class="topnav__link" href="/config"><span class="topnav__link--label">设置</span></a>
+    </nav>
+    <div class="topnav__tools">
+      <button class="theme-toggle" id="theme-toggle" title="切换主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="chat-shell">
+    <div class="chat-toolbar reveal">
+      <span class="tag accent" id="model-tag">模型加载中…</span>
+      <span class="muted" id="tools-tag">工具加载中…</span>
+      <span style="margin-left: auto;"></span>
+      <button class="btn" id="new-chat">↻ 新对话</button>
+    </div>
+
+    <div class="chat-stream-wrap" id="stream-wrap">
+      <div class="placeholder-tip" id="placeholder">
+        <div style="font-size: 56px; margin-bottom: 16px;">🛫</div>
+        <h3>把出行问题交给我</h3>
+        <p class="muted" style="margin-bottom: 20px;">当我需要时，会主动调用高德地图 MCP 工具（路线、POI、天气等），并在消息流中显示调用卡片。</p>
+        <div>
+          <span class="suggest-chip" data-q="从北京南站到故宫怎么走？">从北京南站到故宫怎么走？</span>
+          <span class="suggest-chip" data-q="上海陆家嘴附近 1km 内有什么好吃的？">上海陆家嘴附近美食</span>
+          <span class="suggest-chip" data-q="杭州今天天气怎么样？">杭州今天天气</span>
+          <span class="suggest-chip" data-q="把 IP 114.114.114.114 定位一下">IP 定位</span>
+        </div>
+      </div>
+      <div class="chat-stream" id="stream" style="display:none;"></div>
+    </div>
+
+    <div class="chat-input-wrap">
+      <div class="chat-input">
+        <textarea
+          id="input"
+          class="textarea"
+          placeholder="输入你想问的出行问题（Enter 发送 · Shift+Enter 换行）"
+          rows="1"
+        ></textarea>
+        <button id="send" class="btn btn--accent">发送</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="/static/assets/js/common.js"></script>
+  <script src="/static/assets/js/pages/chat.js"></script>
+</body>
+</html>
